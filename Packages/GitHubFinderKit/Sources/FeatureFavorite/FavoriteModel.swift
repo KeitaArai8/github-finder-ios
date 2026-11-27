@@ -37,7 +37,12 @@ public final class FavoriteModel {
         guard hasStartedLoading else { return .idle }
         guard hasLoaded else { return .loading }
         let rawFavorites = favoriteStore.favorites
-        guard !rawFavorites.isEmpty else { return .empty }
+        guard !rawFavorites.isEmpty else {
+            // 表示できるお気に入りが無いまま読み込みに失敗したときは、「0 件」ではなくエラーとして見せる
+            return favoriteStore.hasRefreshFailed
+                ? .error(String(localized: "お気に入りの読み込みに失敗しました", bundle: #bundle))
+                : .empty
+        }
         return .loaded(applySortAndFilter(rawFavorites))
     }
     public private(set) var errorMessage: String?
@@ -256,7 +261,7 @@ public final class FavoriteModel {
     #if DEBUG
     /// Preview 用: viewState の元になる事実だけを注入する。
     /// 一覧そのもの（loaded / empty）は Preview 側が favoriteStore に仕込んだデータを load() が読み込んで決まる
-    public func _setPreviewState(
+    func _setPreviewState(
         hasStartedLoading: Bool,
         hasLoaded: Bool,
         isEditMode: Bool = false,

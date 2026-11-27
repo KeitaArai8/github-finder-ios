@@ -17,14 +17,20 @@ final class MockSearchRepository: SearchRepositoryProtocol, @unchecked Sendable 
     var searchCallCount = 0
     var lastSearchQuery: String?
     var lastSearchPage: Int?
+    var lastForceRefresh: Bool?
 
-    func search(query: String, page: Int) async throws -> SearchResultEntity {
+    func search(
+        query: String,
+        page: Int,
+        forceRefresh: Bool
+    ) async throws -> SearchResultEntity {
         // 一度サスペンドして、onLoadMore の2回目の呼び出しが isLoadingMore=true の状態で割り込めるようにする
         // （無いと1回目が完了してしまい二重呼び出し防止のテスト loadMorePreventsDuplicateCalls が成立しない）
         await Task.yield()
         searchCallCount += 1
         lastSearchQuery = query
         lastSearchPage = page
+        lastForceRefresh = forceRefresh
         return try searchResult.get()
     }
 }

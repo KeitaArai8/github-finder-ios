@@ -47,17 +47,16 @@ jobs:
             -resultBundlePath BuildResults.xcresult \
             CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= PROVISIONING_PROFILE_SPECIFIER= | xcbeautify
 
+      # 単体テストは GitHubFinderKit パッケージのテストターゲットにあり、アプリを起動せずに実行する
       - name: Unit Test
+        working-directory: Packages/GitHubFinderKit
         run: |
           set -o pipefail
-          xcodebuild test-without-building \
-            -project GitHubFinder.xcodeproj \
-            -scheme GitHubFinder \
+          xcodebuild test \
+            -scheme GitHubFinderKit-Package \
             -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
-            -derivedDataPath DerivedData \
-            -only-testing:GitHubFinderTests \
-            -resultBundlePath TestResults.xcresult \
-            CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= PROVISIONING_PROFILE_SPECIFIER= | xcbeautify
+            -derivedDataPath ../../DerivedData/Package \
+            -resultBundlePath ../../TestResults.xcresult | xcbeautify
 
       - name: Upload Test Results
         if: always()

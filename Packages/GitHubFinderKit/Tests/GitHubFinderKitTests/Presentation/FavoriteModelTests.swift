@@ -102,18 +102,55 @@ struct FavoriteModelTests {
 
     // MARK: - 読み込み失敗
 
-    @Test("読み込み失敗時にempty状態になる（FavoriteStoreのrefreshは例外を吸収する）")
-    func loadFailureTransitionsToEmpty() async throws {
-        // Arrange: FavoriteStoreはrefresh失敗時に例外を吸収し、空のままとなる
+    @Test("表示できるお気に入りが無いまま読み込みに失敗するとerror状態になる")
+    func loadFailureWithoutDataTransitionsToError() async throws {
+        // Arrange: getAll が失敗するリポジトリ（お気に入りは未取得）
         let mockFavorite = MockFavoriteRepository()
         mockFavorite.shouldThrowOnGetAll = true
         let model = FavoriteModelTests.makeModel(favoriteRepository: mockFavorite)
 
-        // Act:
+        // Act: 画面表示時の読み込み
         await model.load()
 
-        // Assert: FavoriteStore.refresh()が例外を吸収し、favorites=[]のままなのでempty
-        #expect(model.viewState == .empty)
+        // Assert: 「0 件」ではなくエラーとして見せる
+        guard case .error = model.viewState else {
+            Issue.record("Expected error state, got \(model.viewState)")
+            return
+        }
+    }
+
+    @Test("読み込み失敗のあと再試行が成功するとerror状態から抜ける")
+    func retryAfterLoadFailureRecovers() async throws {
+        // Arrange: 1 回目の読み込みが失敗して error 状態のモデル
+        let mockFavorite = MockFavoriteRepository()
+        mockFavorite.shouldThrowOnGetAll = true
+        let model = FavoriteModelTests.makeModel(favoriteRepository: mockFavorite)
+        await model.load()
+
+        // Act: リポジトリが復旧し、お気に入り 1 件を返す状態で再試行
+        mockFavorite.shouldThrowOnGetAll = false
+        mockFavorite.favorites = [TestData.makeFavorite(id: 1)]
+        await model.onRefresh()
+
+        // Assert: 取得した 1 件が loaded で表示される
+        #expect(model.viewState == .loaded(mockFavorite.favorites))
+    }
+
+    @Test("表示中のお気に入りがあるときの更新失敗では一覧を維持する")
+    func refreshFailureWithDataKeepsList() async throws {
+        // Arrange: お気に入り 1 件を読み込み済みのモデル
+        let mockFavorite = MockFavoriteRepository()
+        let favorite = TestData.makeFavorite(id: 1)
+        mockFavorite.favorites = [favorite]
+        let model = FavoriteModelTests.makeModel(favoriteRepository: mockFavorite)
+        await model.load()
+
+        // Act: 更新が失敗する
+        mockFavorite.shouldThrowOnGetAll = true
+        await model.onRefresh()
+
+        // Assert: 一覧は前回の内容のまま（error にしない）
+        #expect(model.viewState == .loaded([favorite]))
     }
 
     // MARK: - 削除失敗

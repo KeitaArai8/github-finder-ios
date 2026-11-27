@@ -49,7 +49,8 @@ public struct GitHubRemoteDataSource: Sendable {
         switch httpResponse.statusCode {
         case 200:
             return try decoder.decode(SearchResponseDTO.self, from: data)
-        case 403:
+        case 403, 429:
+            // GitHub はレート制限の超過を 403 または 429 で返す
             throw AppError.rateLimit
         case 400...599:
             throw AppError.server(statusCode: httpResponse.statusCode)

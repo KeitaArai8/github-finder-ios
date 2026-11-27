@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import WidgetKit
 import GitHubFinderData
 import FeatureSearch
 import FeatureFavorite
@@ -47,7 +48,13 @@ struct GitHubFinderApp: App {
         )
 
         // Shared Stores
-        let favoriteStore = FavoriteStore(favoriteRepository: favoriteRepository)
+        let favoriteStore = FavoriteStore(
+            favoriteRepository: favoriteRepository,
+            // お気に入りの変更をウィジェットへ即時反映する（次回の定期更新を待たない）
+            onFavoritesChanged: {
+                WidgetCenter.shared.reloadTimelines(ofKind: AppGroupContainer.favoriteWidgetKind)
+            }
+        )
         let searchHistoryStore = SearchHistoryStore()
 
         // Models (State Holders)

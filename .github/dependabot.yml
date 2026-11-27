@@ -3,7 +3,7 @@ updates:
   # Swift Package Manager（このプロジェクトは現時点で外部 SPM 依存なし。
   # 将来導入された場合に自動で更新 PR が来るよう設定）
   - package-ecosystem: "swift"
-    directory: "/"
+    directory: "/Packages/GitHubFinderKit"
     schedule:
       interval: "weekly"
       day: "monday"

@@ -32,12 +32,12 @@
       <Testables>
          <TestableReference
             skipped = "NO"
-            parallelizable = "YES">
+            parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "715632C32F8B2EA80024F442"
-               BuildableName = "GitHubFinderTests.xctest"
-               BlueprintName = "GitHubFinderTests"
+               BlueprintIdentifier = "715632CD2F8B2EA80024F442"
+               BuildableName = "GitHubFinderUITests.xctest"
+               BlueprintName = "GitHubFinderUITests"
                ReferencedContainer = "container:GitHubFinder.xcodeproj">
             </BuildableReference>
          </TestableReference>

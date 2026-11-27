@@ -4,10 +4,11 @@
 // Now in Android (NiA) 風のモジュール分割を iOS で実現するための local Swift Package。
 // アプリ本体（Xcode App target）からは複数の library product を import する。
 // レイヤ依存:
-//   Domain  ← Data ← Feature*
-//                  ← DesignSystem ← Feature*
-//   Domain ← DesignSystem
-// すべての Feature target は Domain / Data / DesignSystem に依存し、Feature 同士は不参照。
+//   Domain ← Data ← Feature*
+//   Domain ← Feature*
+//   DesignSystem ← Feature*（DesignSystem は他の target に依存しない）
+// FeatureSearch / FeatureFavorite は Domain / Data / DesignSystem に、FeatureSettings / FeatureTutorial は
+// DesignSystem だけに依存する。Feature 同士は不参照。
 //
 // ローカライズ: model 層の String(localized:) は各 target の Resources/Localizable.xcstrings と
 // `bundle: #bundle` で解決する。
@@ -52,7 +53,6 @@ let package = Package(
         ),
         .target(
             name: "GitHubFinderDesignSystem",
-            dependencies: ["GitHubFinderDomain"],
             path: "Sources/GitHubFinderDesignSystem",
             resources: [.process("Resources")],
             swiftSettings: [
@@ -117,6 +117,22 @@ let package = Package(
                 .defaultIsolation(MainActor.self),
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("InferIsolatedConformances"),
+            ],
+        ),
+
+        // MARK: - Tests
+        .testTarget(
+            name: "GitHubFinderKitTests",
+            dependencies: [
+                "GitHubFinderDomain",
+                "GitHubFinderData",
+                "GitHubFinderDesignSystem",
+                "FeatureSearch",
+                "FeatureFavorite",
+            ],
+            path: "Tests/GitHubFinderKitTests",
+            swiftSettings: [
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
             ],
         ),
     ]

@@ -63,7 +63,7 @@ Android公式に従い、各DataSourceは**単一のデータソースのみ**�
 | `SearchCacheDataSource` | 検索結果のメモリキャッシュ | Dictionary (actor) |
 | `TutorialLocalDataSource` | チュートリアルフラグ管理 | UserDefaults |
 
-Repository が複数の DataSource を統合し、エラー変換やキャッシュ制御を行います。
+`SearchRepositoryImpl` はリモートとキャッシュの 2 つの DataSource を統合し、エラー変換とキャッシュ制御を行います。`FavoriteRepositoryImpl` は `FavoriteLocalDataSource` へそのまま委譲します（エラーは変換しません）。
 
 ### SSOT（単一信頼源）
 
@@ -80,11 +80,10 @@ Entity にフラグを持たせず、Model 内で表示用構造体 `RepositoryD
 ```
 SearchModel（内部）
 ├── allItems: [RepositoryEntity]       ← API から取得した生データ
-├── favoriteStore: FavoriteStore       ← お気に入り ID の SSOT（DB）を購読
-└── updateLoadedState()                ← 突き合わせて RepositoryDisplayItem に変換
+└── favoriteStore: FavoriteStore       ← お気に入り ID を保持する共有 Store（追加・削除・読み込みのたびに DB から取り直す）
 
 SearchModel（公開）
-└── viewState: ViewState<[RepositoryDisplayItem]>  ← View はこれを表示するだけ
+└── viewState: ViewState<[RepositoryDisplayItem]>  ← 上の 2 つから都度導出する。View はこれを表示するだけ
 ```
 
 ### エラーハンドリング
@@ -92,7 +91,7 @@ SearchModel（公開）
 ```
 DataSource → 生の例外を throw
     ↓
-Repository → catch して AppError に変換
+Repository → SearchRepositoryImpl は catch して AppError に変換（FavoriteRepositoryImpl は変換せずそのまま throw）
     ↓
 Model → AppError を ViewState.error に反映
     ↓
@@ -173,13 +172,16 @@ final class NetworkMonitor {
 }
 ```
 
-`AppRootView` で `ZStack(alignment: .top)` の最上位に重ね、`AnimatedVisibility` 相当の SwiftUI トランジションで切替:
+`AppRootView` でメイン画面に `safeAreaBar(edge: .top)` として差し込み、トランジションで切替（バナーの分だけコンテンツが下がる）:
 
 ```swift
-if !networkMonitor.isConnected {
-    OfflineBanner()
-        .transition(.move(edge: .top).combined(with: .opacity))
-}
+MainTabView(...)
+    .safeAreaBar(edge: .top) {
+        if !networkMonitor.isConnected {
+            OfflineBanner()
+                .transition(.move(edge: .top).combined(with: .opacity))
+        }
+    }
 ```
 
 ### 構造化ログ（os.Logger）
@@ -224,23 +226,22 @@ GitHubFinder/
 │   └── Localizable.xcstrings
 │
 ├── DesignSystemCatalog/                       ← DesignSystem のカタログアプリ（別ターゲット）
-├── GitHubFinderTests/                         ← Swift Testing の単体テスト
 ├── GitHubFinderUITests/                       ← XCUITest
 │
-└── Packages/GitHubFinderKit/                  ← Local Swift Package（7 target）
+└── Packages/GitHubFinderKit/                  ← Local Swift Package（7 target + テスト 1 target）
     ├── Package.swift
+    ├── Tests/GitHubFinderKitTests/            ← Swift Testing の単体テスト（アプリを起動せずに実行）
     └── Sources/
-        ├── GitHubFinderDomain/                ← Entity / Repository protocol / AppError / AppLogger
-        │                                        （依存なし。全 target が transitively 依存）
+        ├── GitHubFinderDomain/                ← Entity / Repository protocol / AppError / AppLogger /
+        │                                        GitHubURL（依存なし）
         ├── GitHubFinderData/                  ← Repository Impl / DataSource (Remote/Local/Cache)
         │                                        DTO / DB / NetworkMonitor / FavoriteStore /
         │                                        SearchHistoryStore + Protocol / AppGroupContainer
         │                                        （依存: Domain）
         ├── GitHubFinderDesignSystem/          ← Tokens (Spacing / Radius / AppColor / AppFont) /
         │                                        ViewState / ErrorView / OfflineBanner /
-        │                                        RepositoryDisplayItem / GitHubURL /
-        │                                        SafariView（依存: Domain）
-        ├── FeatureSearch/                     ← SearchModel + SearchView
+        │                                        RepositorySummaryView / SafariView（依存なし）
+        ├── FeatureSearch/                     ← SearchModel + SearchView + RepositoryDisplayItem
         │                                        （依存: Domain, Data, DesignSystem）
         ├── FeatureFavorite/                   ← FavoriteModel + FavoriteListView
         │                                        （依存: Domain, Data, DesignSystem）
@@ -254,28 +255,28 @@ GitHubFinder/
 ### モジュール依存グラフ
 
 ```
-                    Domain (entities, protocols, errors, logger)
-                       ▲
-              ┌────────┴────────┐
-              │                 │
-            Data            DesignSystem
-              ▲                 ▲
-              │                 │
-   ┌──────────┼──────┬──────────┼─────────┐
-   │          │      │          │         │
-FeatureSearch FeatureFavorite FeatureSettings FeatureTutorial
-   │          │      │          │         │
-   └──────────┴──────┴──────────┴─────────┘
-                       │
-                  App target
-              （composition root）
+   Domain (entities, protocols, errors, logger)        DesignSystem (tokens, 共通 UI)
+      ▲              ▲                                        ▲
+      │              │                                        │
+    Data             │                                        │
+      ▲              │                                        │
+      └──────┬───────┘                                        │
+             │                                                │
+   FeatureSearch / FeatureFavorite ───────────────────────────┤
+                                                              │
+   FeatureSettings / FeatureTutorial ─────────────────────────┘
+
+   App target（composition root）は Data と DesignSystem、4 つの Feature を組み立てる
 ```
+
+DesignSystem は Domain を含むどの target にも依存しません（トークンと、primitive な値だけを受け取る共通 UI）。`SafariView` は 3 つの画面が共有する UI のラッパーなので DesignSystem に置いています。
 
 | ターゲット | 依存先 |
 |---|---|
 | `GitHubFinder.app` | Data, DesignSystem, FeatureSearch, FeatureFavorite, FeatureSettings, FeatureTutorial |
 | `FavoriteWidgetExtension.appex` | Domain, Data |
-| `GitHubFinderTests` | Domain, Data, DesignSystem, FeatureSearch, FeatureFavorite |
+| `GitHubFinderKitTests`（パッケージのテスト） | Domain, Data, DesignSystem, FeatureSearch, FeatureFavorite |
+| `DesignSystemCatalog.app` | DesignSystem |
 
 ## DI の流れ
 
@@ -290,10 +291,14 @@ GitHubFinderApp.init()
 ├── Repositories
 │   ├── SearchRepositoryImpl(remote:, cache:)
 │   └── FavoriteRepositoryImpl(local:)
-└── Models (State Holders)
-    ├── SearchModel(searchRepository:, favoriteStore:, searchHistoryStore:)
-    ├── FavoriteModel(favoriteStore:)
-    └── CoachMarkManager(tutorialDataSource:)
+├── Shared Stores
+│   ├── FavoriteStore(favoriteRepository:, onFavoritesChanged:)  ← 変更時にウィジェットを更新する処理を渡す
+│   └── SearchHistoryStore()
+├── Models (State Holders)
+│   ├── SearchModel(searchRepository:, favoriteStore:, searchHistoryStore:)
+│   ├── FavoriteModel(favoriteStore:)
+│   └── CoachMarkManager(tutorialDataSource:)
+└── NetworkMonitor()
 ```
 
 ## 機能一覧
@@ -327,7 +332,7 @@ GitHubFinderApp.init()
 | 機能 | お気に入り上位5件をホーム画面に表示 |
 | サイズ | Small (1件) / Medium (3件) / Large (5件) |
 | データ取得 | App Group 経由で SwiftData を直接読む |
-| 更新頻度 | 1時間ごと（TimelineProvider .after policy） |
+| 更新頻度 | 1時間ごと（TimelineProvider .after policy）。アプリでお気に入りを追加・削除したときは即時に更新 |
 | タップ動作 | アプリ起動 |
 
 ### チュートリアル（スポットライト型）
@@ -345,7 +350,7 @@ GitHubFinderApp.init()
 | 項目 | 対応 |
 |------|------|
 | ATS | デフォルト有効（HTTPS 強制） |
-| URL 構築 | `URLComponents` で path を自動 percent-encode（[GitHubURL.swift](Packages/GitHubFinderKit/Sources/GitHubFinderDesignSystem/GitHubURL.swift)） |
+| URL 構築 | `URLComponents` で path を自動 percent-encode（[GitHubURL.swift](Packages/GitHubFinderKit/Sources/GitHubFinderDomain/GitHubURL.swift)） |
 | App Group | メインアプリ・Widget 両方で `group.com.example.GitHubFinder` を設定 |
 | データ保護 | 公開リポジトリ情報のみ保存。認証情報なし |
 | SQL インジェクション | SwiftData Predicate（`#Predicate` マクロ）で型安全 |
@@ -354,9 +359,19 @@ GitHubFinderApp.init()
 
 ### Unit Tests（Swift Testing）
 
+`GitHubFinderKit` パッケージのテストターゲット `GitHubFinderKitTests` にあります。アプリを起動せずに実行できます。
+
+```bash
+cd Packages/GitHubFinderKit
+xcodebuild test -scheme GitHubFinderKit-Package -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest'
+```
+
+Xcode では `Packages/GitHubFinderKit` を開いて `GitHubFinderKit-Package` スキームでテストします。`GitHubFinder.xcodeproj` の `GitHubFinder` スキームのテストは UI テストだけです。
+
 | 層 | テストファイル |
 |---|---|
-| Presentation | SearchModelTests, FavoriteModelTests, SearchHistoryStoreTests |
+| Presentation | SearchModelTests, FavoriteModelTests |
+| Data/Store | SearchHistoryStoreTests, FavoriteStoreTests |
 | Data/Cache | SearchCacheDataSourceTests |
 | Data/Local | FavoriteLocalDataSourceTests（SwiftData in-memory）, FavoriteSchemaTests |
 | Data/Remote | GitHubRemoteDataSourceTests（URLProtocol モック） |

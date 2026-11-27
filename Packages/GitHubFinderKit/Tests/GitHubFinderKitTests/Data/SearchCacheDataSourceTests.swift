@@ -78,6 +78,36 @@ struct SearchCacheDataSourceTests {
         #expect(await cache.get(query: "swift", page: 1) != nil)
         #expect(await cache.get(query: "SWIFT", page: 1) != nil)
     }
+
+    @Test("removeAll は指定クエリの全ページだけを破棄する")
+    func removeAllDropsOnlyPagesOfQuery() async {
+        // Arrange: "swift" の 2 ページと、"swift" で始まる別クエリ "swiftui" を保存
+        let cache = SearchCacheDataSource()
+        let result = makeResult(totalCount: 60, itemCount: 30)
+        await cache.set(
+            query: "swift",
+            page: 1,
+            result: result
+        )
+        await cache.set(
+            query: "swift",
+            page: 2,
+            result: result
+        )
+        await cache.set(
+            query: "swiftui",
+            page: 1,
+            result: result
+        )
+
+        // Act: "Swift"（大文字小文字違い）を指定して破棄
+        await cache.removeAll(query: "Swift")
+
+        // Assert: "swift" の全ページが消え、"swiftui" は残る
+        #expect(await cache.get(query: "swift", page: 1) == nil)
+        #expect(await cache.get(query: "swift", page: 2) == nil)
+        #expect(await cache.get(query: "swiftui", page: 1) != nil)
+    }
 }
 
 // MARK: - Helper

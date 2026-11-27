@@ -93,7 +93,7 @@ public final class SearchModel {
         guard !searchQuery.trimmingCharacters(in: .whitespaces).isEmpty else { return }
         currentPage = 1
         allItems = []
-        await performSearch()
+        await performSearch(forceRefresh: true)
     }
 
     public func onLoadMore() async {
@@ -120,7 +120,7 @@ public final class SearchModel {
 
     // MARK: - Private
 
-    private func performSearch() async {
+    private func performSearch(forceRefresh: Bool = false) async {
         isSearching = true
         searchError = nil
         currentPage = 1
@@ -129,7 +129,11 @@ public final class SearchModel {
 
         Logger.search.info("Search started: query=\(self.searchQuery, privacy: .public), page=1")
         do {
-            let result = try await searchRepository.search(query: searchQuery, page: 1)
+            let result = try await searchRepository.search(
+                query: searchQuery,
+                page: 1,
+                forceRefresh: forceRefresh
+            )
             guard !Task.isCancelled else {
                 lastSearchedQuery = nil
                 return
@@ -168,11 +172,19 @@ public final class SearchModel {
     }
 
     private func loadNextPage() async {
+        // 検索ボックスの入力中の文字列（searchQuery）ではなく、表示中の一覧を取得したクエリで続きを取る
+        guard let query = lastSearchedQuery else { return }
         let nextPage = currentPage + 1
 
         do {
-            let result = try await searchRepository.search(query: searchQuery, page: nextPage)
+            let result = try await searchRepository.search(
+                query: query,
+                page: nextPage,
+                forceRefresh: false
+            )
             guard !Task.isCancelled else { return }
+            // 取得中に別の検索が始まっていたら、古い一覧の続きは捨てる
+            guard query == lastSearchedQuery else { return }
 
             currentPage = nextPage
             allItems.append(contentsOf: result.items)
@@ -209,7 +221,7 @@ public final class SearchModel {
     #if DEBUG
     /// Preview 用: viewState の元になる事実だけを注入する。
     /// View の `.task(id:)` が走っても検索済み扱いが保たれるよう、検索済みのクエリも合わせて入れる
-    public func _setPreviewState(_ state: ViewState<[RepositoryDisplayItem]>) {
+    func _setPreviewState(_ state: ViewState<[RepositoryDisplayItem]>) {
         searchQuery = "preview"
         lastSearchedQuery = "preview"
         isSearching = false
