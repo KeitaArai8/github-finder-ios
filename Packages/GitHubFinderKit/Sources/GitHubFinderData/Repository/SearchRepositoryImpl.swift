@@ -48,7 +48,11 @@ public final class SearchRepositoryImpl: SearchRepositoryProtocol, Sendable {
             hasNextPage: hasNextPage
         )
 
-        await cacheDataSource.set(query: query, page: page, result: result)
+        await cacheDataSource.set(
+            query: query,
+            page: page,
+            result: result
+        )
 
         return result
     }

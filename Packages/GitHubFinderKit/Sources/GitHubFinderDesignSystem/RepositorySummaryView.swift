@@ -30,7 +30,7 @@ public struct RepositorySummaryView: View {
     }
 
     public var body: some View {
-        HStack(alignment: .center, spacing: Spacing.spacing150) {
+        HStack(spacing: Spacing.spacing150) {
             avatarImage
             repositoryInfo
         }

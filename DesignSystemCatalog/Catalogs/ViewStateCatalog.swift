@@ -19,7 +19,7 @@ struct ViewStateCatalog: View {
         List {
             Section("State 一覧") {
                 ForEach(allStates, id: \.label) { entry in
-                    HStack {
+                    HStack(spacing: 0) {
                         Text(entry.label)
                             .font(.subheadline.monospaced())
                         Spacer()

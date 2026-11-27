@@ -57,7 +57,12 @@ public struct SearchView: View {
             // 履歴がある場合は履歴一覧を、無ければ初期メッセージを表示
             if model.searchHistoryStore.history.isEmpty {
                 ContentUnavailableView(
-                    label: { Label(LocalizedStringResource("リポジトリを検索", bundle: #bundle), systemImage: "magnifyingglass") },
+                    label: {
+                        Label(
+                            LocalizedStringResource("リポジトリを検索", bundle: #bundle),
+                            systemImage: "magnifyingglass"
+                        )
+                    },
                     description: { Text("キーワードを入力して\nGitHubリポジトリを探しましょう", bundle: #bundle) }
                 )
             } else {
@@ -73,7 +78,12 @@ public struct SearchView: View {
 
         case .empty:
             ContentUnavailableView(
-                label: { Label(LocalizedStringResource("結果が見つかりません", bundle: #bundle), systemImage: "magnifyingglass") },
+                label: {
+                    Label(
+                        LocalizedStringResource("結果が見つかりません", bundle: #bundle),
+                        systemImage: "magnifyingglass"
+                    )
+                },
                 description: { Text("別のキーワードで検索してみてください", bundle: #bundle) }
             )
 
@@ -90,84 +100,79 @@ public struct SearchView: View {
         List {
             Section {
                 ForEach(model.searchHistoryStore.history, id: \.self) { query in
-                    // 行タップで再検索 / 行末 X タップで個別削除（Android と統一）。
-                    // swipeActions ではなく trailing X icon を採用しているのは、検索履歴の業界 defacto
-                    // (Google / YouTube / Chrome 等) に従い、可視性と 1-tap 完結を優先するため。
-                    //
-                    // 構造: 「行タップ用 Button」と「X 削除 Button」を並列に配置し、
-                    //       両方を `.buttonStyle(.plain)` で SwiftUI に「独立した tap 領域」と認識させる。
-                    //       VoiceOver でも 2 つの操作要素として個別フォーカスされる。
-                    HStack(spacing: 0) {
-                        Button {
-                            Task { await model.selectHistory(query) }
-                        } label: {
-                            HStack(spacing: Spacing.spacing150) {
-                                Image(systemName: "clock.arrow.circlepath")
-                                    .foregroundStyle(Color.Content.secondary)
-                                Text(query)
-                                    .foregroundStyle(Color.Content.primary)
-                                Spacer(minLength: 0)
-                            }
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel(query)
-                        .accessibilityHint(Text("ダブルタップでこのキーワードを再検索", bundle: #bundle))
-
-                        Button {
-                            model.removeHistory(query)
-                        } label: {
-                            Image(systemName: "xmark")
-                                .font(.appLabelMedium)
-                                .foregroundStyle(Color.Content.tertiary)
-                                .frame(width: Self.historyDeleteButtonSide, height: Self.historyDeleteButtonSide)
-                                .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel(Text("\(query) を履歴から削除", bundle: #bundle))
-                    }
+                    searchHistoryRow(query)
                 }
             } header: {
-                HStack {
-                    Text("最近の検索", bundle: #bundle)
-                    Spacer()
-                    Button(LocalizedStringResource("すべて消去", bundle: #bundle), role: .destructive) {
-                        model.clearHistory()
-                    }
-                    .font(.appLabelMedium)
-                    .textCase(nil)
-                }
+                searchHistoryHeader
             }
         }
         .listStyle(.plain)
     }
 
+    /// 行タップで再検索 / 行末 X タップで個別削除（Android と統一）。
+    /// swipeActions ではなく trailing X icon を採用しているのは、検索履歴の業界 defacto
+    /// (Google / YouTube / Chrome 等) に従い、可視性と 1-tap 完結を優先するため。
+    ///
+    /// 構造: 「行タップ用 Button」と「X 削除 Button」を並列に配置し、
+    ///       両方を `.buttonStyle(.plain)` で SwiftUI に「独立した tap 領域」と認識させる。
+    ///       VoiceOver でも 2 つの操作要素として個別フォーカスされる。
+    private func searchHistoryRow(_ query: String) -> some View {
+        HStack(spacing: 0) {
+            Button {
+                Task { await model.selectHistory(query) }
+            } label: {
+                HStack(spacing: Spacing.spacing150) {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .foregroundStyle(Color.Content.secondary)
+                    Text(query)
+                        .foregroundStyle(Color.Content.primary)
+                    Spacer(minLength: 0)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(query)
+            .accessibilityHint(Text("ダブルタップでこのキーワードを再検索", bundle: #bundle))
+
+            Button {
+                model.removeHistory(query)
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.appLabelMedium)
+                    .foregroundStyle(Color.Content.tertiary)
+                    .frame(
+                        width: Self.historyDeleteButtonSide,
+                        height: Self.historyDeleteButtonSide
+                    )
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("\(query) を履歴から削除", bundle: #bundle))
+        }
+    }
+
+    private var searchHistoryHeader: some View {
+        HStack(spacing: 0) {
+            Text("最近の検索", bundle: #bundle)
+            Spacer()
+            Button(LocalizedStringResource("すべて消去", bundle: #bundle), role: .destructive) {
+                model.clearHistory()
+            }
+            .font(.appLabelMedium)
+            .textCase(nil)
+        }
+    }
+
+    // MARK: - Repository List
+
     private func repositoryList(_ items: [RepositoryDisplayItem]) -> some View {
         List {
             ForEach(items) { item in
-                RepositoryRow(
-                    item: item,
-                    onOpen: {
-                        safariDestination = makeGitHubURL(fullName: item.fullName).map(SafariDestination.init(url:))
-                    },
-                    onFavoriteTap: { Task { await model.toggleFavorite(item) } }
-                )
-                .contextMenu {
-                    if let url = makeGitHubURL(fullName: item.fullName) {
-                        ShareLink(item: url) {
-                            Label(LocalizedStringResource("リポジトリをシェア", bundle: #bundle), systemImage: "square.and.arrow.up")
-                        }
-                    }
-                }
-                .onAppear {
-                    if items.suffix(3).contains(where: { $0.id == item.id }) {
-                        Task { await model.onLoadMore() }
-                    }
-                }
+                repositoryRow(item, in: items)
             }
 
             if model.isLoadingMore {
-                HStack {
+                HStack(spacing: 0) {
                     Spacer()
                     ProgressView()
                     Spacer()
@@ -178,6 +183,35 @@ public struct SearchView: View {
         .listStyle(.plain)
         .refreshable {
             await model.onRefresh()
+        }
+    }
+
+    private func repositoryRow(
+        _ item: RepositoryDisplayItem,
+        in items: [RepositoryDisplayItem]
+    ) -> some View {
+        RepositoryRow(
+            item: item,
+            onOpen: {
+                safariDestination = makeGitHubURL(fullName: item.fullName)
+                    .map(SafariDestination.init(url:))
+            },
+            onFavoriteTap: { Task { await model.toggleFavorite(item) } }
+        )
+        .contextMenu {
+            if let url = makeGitHubURL(fullName: item.fullName) {
+                ShareLink(item: url) {
+                    Label(
+                        LocalizedStringResource("リポジトリをシェア", bundle: #bundle),
+                        systemImage: "square.and.arrow.up"
+                    )
+                }
+            }
+        }
+        .onAppear {
+            if items.suffix(3).contains(where: { $0.id == item.id }) {
+                Task { await model.onLoadMore() }
+            }
         }
     }
 }
@@ -192,9 +226,9 @@ private struct RepositoryRow: View {
     var body: some View {
         // 「リポジトリを開く Button」と「お気に入り Button」を並列に配置する（検索履歴行と同じ構造）。
         // 入れ子にせず独立した tap 領域にすることで、タップが衝突せず VoiceOver でも別々のボタンとして読まれる。
-        HStack(alignment: .center, spacing: Spacing.spacing150) {
+        HStack(spacing: Spacing.spacing150) {
             Button(action: onOpen) {
-                HStack(alignment: .center, spacing: Spacing.spacing150) {
+                HStack(spacing: Spacing.spacing150) {
                     RepositorySummaryView(
                         fullName: item.fullName,
                         description: item.description,
@@ -220,10 +254,22 @@ private struct RepositoryRow: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(item.isFavorite
-            ? Text("お気に入りから削除", bundle: #bundle, comment: "Accessibility label when the repository is currently a favorite")
-            : Text("お気に入りに追加", bundle: #bundle, comment: "Accessibility label when the repository is not a favorite yet")
+            ? Text(
+                "お気に入りから削除",
+                bundle: #bundle,
+                comment: "Accessibility label when the repository is currently a favorite"
+            )
+            : Text(
+                "お気に入りに追加",
+                bundle: #bundle,
+                comment: "Accessibility label when the repository is not a favorite yet"
+            )
         )
-        .accessibilityHint(Text("ダブルタップで切り替え", bundle: #bundle, comment: "Accessibility hint for favorite toggle"))
+        .accessibilityHint(Text(
+            "ダブルタップで切り替え",
+            bundle: #bundle,
+            comment: "Accessibility hint for favorite toggle"
+        ))
     }
 }
 
@@ -251,7 +297,12 @@ private func makePreviewSearchModel(
     return model
 }
 
-private func previewItem(id: Int, fullName: String, star: Int, language: String? = "Swift") -> RepositoryDisplayItem {
+private func makePreviewItem(
+    id: Int,
+    fullName: String,
+    star: Int,
+    language: String? = "Swift"
+) -> RepositoryDisplayItem {
     RepositoryDisplayItem(
         repository: RepositoryEntity(
             id: id,
@@ -278,9 +329,22 @@ private func previewItem(id: Int, fullName: String, star: Int, language: String?
 
 #Preview("Loaded") {
     SearchView(model: makePreviewSearchModel(state: .loaded([
-        previewItem(id: 1, fullName: "apple/swift", star: 67_000, language: "C++"),
-        previewItem(id: 2, fullName: "pointfreeco/swift-composable-architecture", star: 13_000),
-        previewItem(id: 3, fullName: "Alamofire/Alamofire", star: 41_000),
+        makePreviewItem(
+            id: 1,
+            fullName: "apple/swift",
+            star: 67_000,
+            language: "C++"
+        ),
+        makePreviewItem(
+            id: 2,
+            fullName: "pointfreeco/swift-composable-architecture",
+            star: 13_000
+        ),
+        makePreviewItem(
+            id: 3,
+            fullName: "Alamofire/Alamofire",
+            star: 41_000
+        ),
     ])))
 }
 
@@ -300,7 +364,11 @@ private func previewItem(id: Int, fullName: String, star: Int, language: String?
 
 private nonisolated final class PreviewSearchRepository: SearchRepositoryProtocol {
     func search(query: String, page: Int) async throws -> SearchResultEntity {
-        SearchResultEntity(totalCount: 0, items: [], hasNextPage: false)
+        SearchResultEntity(
+            totalCount: 0,
+            items: [],
+            hasNextPage: false
+        )
     }
 }
 

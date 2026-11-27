@@ -32,7 +32,12 @@ struct GitHubRemoteDataSourceTests {
         }
         """.data(using: .utf8)!
         MockURLProtocolForRemote.requestHandler = { request in
-            (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, json)
+            (HTTPURLResponse(
+                url: request.url!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            )!, json)
         }
         let dataSource = GitHubRemoteDataSource(session: MockURLProtocolForRemote.makeURLSession())
 
@@ -51,7 +56,12 @@ struct GitHubRemoteDataSourceTests {
         MockURLProtocolForRemote.reset()
         MockURLProtocolForRemote.requestHandler = { request in
             let json = #"{"total_count":0,"items":[]}"#.data(using: .utf8)!
-            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, json)
+            return (HTTPURLResponse(
+                url: request.url!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            )!, json)
         }
         let dataSource = GitHubRemoteDataSource(session: MockURLProtocolForRemote.makeURLSession())
 
@@ -72,7 +82,12 @@ struct GitHubRemoteDataSourceTests {
         // Arrange: 403 を返すモック
         MockURLProtocolForRemote.reset()
         MockURLProtocolForRemote.requestHandler = { request in
-            (HTTPURLResponse(url: request.url!, statusCode: 403, httpVersion: nil, headerFields: nil)!, Data())
+            (HTTPURLResponse(
+                url: request.url!,
+                statusCode: 403,
+                httpVersion: nil,
+                headerFields: nil
+            )!, Data())
         }
         let dataSource = GitHubRemoteDataSource(session: MockURLProtocolForRemote.makeURLSession())
 
@@ -87,7 +102,12 @@ struct GitHubRemoteDataSourceTests {
         // Arrange: 指定のステータスコードを返すモック
         MockURLProtocolForRemote.reset()
         MockURLProtocolForRemote.requestHandler = { request in
-            (HTTPURLResponse(url: request.url!, statusCode: statusCode, httpVersion: nil, headerFields: nil)!, Data())
+            (HTTPURLResponse(
+                url: request.url!,
+                statusCode: statusCode,
+                httpVersion: nil,
+                headerFields: nil
+            )!, Data())
         }
         let dataSource = GitHubRemoteDataSource(session: MockURLProtocolForRemote.makeURLSession())
 
@@ -113,7 +133,12 @@ struct GitHubRemoteDataSourceTests {
         MockURLProtocolForRemote.reset()
         MockURLProtocolForRemote.requestHandler = { request in
             let invalid = "not json".data(using: .utf8)!
-            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, invalid)
+            return (HTTPURLResponse(
+                url: request.url!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            )!, invalid)
         }
         let dataSource = GitHubRemoteDataSource(session: MockURLProtocolForRemote.makeURLSession())
 

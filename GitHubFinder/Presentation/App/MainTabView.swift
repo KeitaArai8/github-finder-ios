@@ -14,7 +14,11 @@ struct MainTabView: View {
 
     var body: some View {
         TabView {
-            Tab("検索", systemImage: "magnifyingglass", role: .search) {
+            Tab(
+                "検索",
+                systemImage: "magnifyingglass",
+                role: .search
+            ) {
                 SearchView(model: searchModel)
             }
 

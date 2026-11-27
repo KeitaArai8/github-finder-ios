@@ -19,7 +19,10 @@ public final class SearchModel {
         if let searchError { return .error(searchError) }
         if !allItems.isEmpty {
             return .loaded(allItems.map { repo in
-                RepositoryDisplayItem(repository: repo, isFavorite: favoriteStore.contains(id: repo.id))
+                RepositoryDisplayItem(
+                    repository: repo,
+                    isFavorite: favoriteStore.contains(id: repo.id)
+                )
             })
         }
         // 検索が一度も実行されていない（初回起動など）間は .idle。.empty は「検索した結果 0 件」専用
@@ -136,7 +139,9 @@ public final class SearchModel {
             hasNextPage = result.hasNextPage
             await favoriteStore.refresh()
 
-            Logger.search.info("Search succeeded: count=\(result.items.count), totalCount=\(result.totalCount), hasNextPage=\(result.hasNextPage)")
+            Logger.search.info(
+                "Search succeeded: count=\(result.items.count), totalCount=\(result.totalCount), hasNextPage=\(result.hasNextPage)"
+            )
 
             // 結果が 0 件でも「ユーザが意図して入力した検索語」であることに変わりはないので履歴に残す
             searchHistoryStore.add(searchQuery)
@@ -145,17 +150,21 @@ public final class SearchModel {
             // 遅れて失敗した古い検索が書いた searchError を、新しい検索の成功で確実に消す
             searchError = nil
         } catch {
-            // 完了していない検索（キャンセル・失敗）は「検索済み」にしない
-            // （同じクエリへ戻したり再入力したり、タブ復帰したときに再検索できるように）
-            lastSearchedQuery = nil
-            if error is CancellationError || Task.isCancelled {
-                Logger.search.debug("Search cancelled: query=\(self.searchQuery, privacy: .public)")
-                return
-            }
-            Logger.search.error("Search failed: \(String(describing: error), privacy: .public)")
-            isSearching = false
-            searchError = error.localizedDescription
+            handleSearchFailure(error)
         }
+    }
+
+    private func handleSearchFailure(_ error: any Error) {
+        // 完了していない検索（キャンセル・失敗）は「検索済み」にしない
+        // （同じクエリへ戻したり再入力したり、タブ復帰したときに再検索できるように）
+        lastSearchedQuery = nil
+        if error is CancellationError || Task.isCancelled {
+            Logger.search.debug("Search cancelled: query=\(self.searchQuery, privacy: .public)")
+            return
+        }
+        Logger.search.error("Search failed: \(String(describing: error), privacy: .public)")
+        isSearching = false
+        searchError = error.localizedDescription
     }
 
     private func loadNextPage() async {

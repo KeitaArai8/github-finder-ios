@@ -27,13 +27,13 @@ public struct TutorialScreen: View {
 
     public var body: some View {
         ZStack {
-            Color(.systemBackground).ignoresSafeArea()
+            Color.Background.primary.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 headerTitle
                 mockSearchBar
                 mockRepositoryRow
-                    .padding(.top, 24)
+                    .padding(.top, Spacing.spacing300)
                 Spacer()
                 mockTabBar
             }
@@ -55,28 +55,28 @@ public struct TutorialScreen: View {
     // MARK: - Mock UI
 
     private var headerTitle: some View {
-        HStack {
+        HStack(spacing: 0) {
             Text("検索", bundle: #bundle)
-                .font(.largeTitle.bold())
+                .font(.appTitleLarge)
             Spacer()
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 16)
+        .padding(.horizontal, Spacing.spacing200)
+        .padding(.top, Spacing.spacing200)
     }
 
     private var mockSearchBar: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: Spacing.spacing100) {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.secondary)
             Text("リポジトリを検索", bundle: #bundle)
                 .foregroundStyle(.secondary)
             Spacer()
         }
-        .padding(.horizontal, 12)
+        .padding(.horizontal, Spacing.spacing150)
         .padding(.vertical, 10)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10))
-        .padding(.horizontal, 16)
-        .padding(.top, 16)
+        .background(Color.Background.secondary, in: RoundedRectangle(cornerRadius: 10))
+        .padding(.horizontal, Spacing.spacing200)
+        .padding(.top, Spacing.spacing200)
         .coachMarkAnchor(for: .searchBar)
         .contentShape(Rectangle())
         .onTapGesture {
@@ -85,24 +85,24 @@ public struct TutorialScreen: View {
     }
 
     private var mockRepositoryRow: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: Spacing.spacing150) {
             Color.gray.opacity(0.25)
                 .frame(width: 40, height: 40)
                 .clipShape(RoundedRectangle(cornerRadius: Radius.radius100))
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: Spacing.spacing50) {
                 Text(mockRepo.fullName)
-                    .font(.headline)
+                    .font(.appTitleSmall)
                 Text(mockRepo.description)
-                    .font(.subheadline)
+                    .font(.appBodyMedium)
                     .foregroundStyle(.secondary)
-                HStack(spacing: 12) {
+                HStack(spacing: Spacing.spacing150) {
                     Label("\(mockRepo.starCount)", systemImage: "star.fill")
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(Color.Brand.star)
                     Text(mockRepo.language)
                         .foregroundStyle(.secondary)
                 }
-                .font(.caption)
+                .font(.appLabelMedium)
             }
 
             Spacer()
@@ -118,20 +118,28 @@ public struct TutorialScreen: View {
             .buttonStyle(.plain)
             .coachMarkAnchor(for: .favoriteButton)
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, Spacing.spacing200)
     }
 
     private var mockTabBar: some View {
         // 実機の iOS 26 タブバーと同じ並び: お気に入り・設定が 1 つのカプセル、検索（role: .search）は右端に独立した丸
-        GlassEffectContainer(spacing: 8) {
-            HStack(spacing: 8) {
+        GlassEffectContainer(spacing: Spacing.spacing100) {
+            HStack(spacing: Spacing.spacing100) {
                 HStack(spacing: 0) {
-                    tabItem(systemImage: "heart.fill", label: LocalizedStringResource("お気に入り", bundle: #bundle), isSelected: false) {
+                    tabItem(
+                        systemImage: "heart.fill",
+                        label: LocalizedStringResource("お気に入り", bundle: #bundle),
+                        isSelected: false
+                    ) {
                         coachMarkManager.advance(after: .favoriteTab)
                     }
                     .coachMarkAnchor(for: .favoriteTab)
 
-                    tabItem(systemImage: "gearshape", label: LocalizedStringResource("設定", bundle: #bundle), isSelected: false) {}
+                    tabItem(
+                        systemImage: "gearshape",
+                        label: LocalizedStringResource("設定", bundle: #bundle),
+                        isSelected: false
+                    ) {}
                 }
                 .frame(height: 56)
                 // iOS 26 のタブバーは画面下端に浮くガラスのカプセル。material の帯ではなく同じ見た目に揃える
@@ -139,14 +147,14 @@ public struct TutorialScreen: View {
 
                 Image(systemName: "magnifyingglass")
                     .font(.title3)
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(Color.Content.accent)
                     .frame(width: 56, height: 56)
                     .glassEffect(.regular, in: .circle)
                     .accessibilityLabel(Text("検索", bundle: #bundle))
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.bottom, 8)
+        .padding(.horizontal, Spacing.spacing200)
+        .padding(.bottom, Spacing.spacing100)
     }
 
     private func tabItem(
@@ -158,11 +166,11 @@ public struct TutorialScreen: View {
         Button(action: action) {
             VStack(spacing: 2) {
                 Image(systemName: systemImage)
-                    .font(.body)
+                    .font(.appBodyLarge)
                 Text(label)
-                    .font(.caption2)
+                    .font(.appLabelSmall)
             }
-            .foregroundStyle(isSelected ? Color.accentColor : Color.gray)
+            .foregroundStyle(isSelected ? Color.Content.accent : Color.gray)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .buttonStyle(.plain)

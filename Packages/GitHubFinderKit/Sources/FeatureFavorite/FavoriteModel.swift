@@ -3,7 +3,7 @@
  お気に入り一覧の状態管理を担当するState Holder。
  通常表示モードと編集モード（複数選択→一括削除）を切り替える。
  ソート・言語フィルタはメモリ保持（永続化なし）。生データは favoriteStore.favorites のまま保持し、
- displayedFavorites で表示順を導出する。
+ viewState の導出時に表示順を決める。
  */
 
 import Foundation
@@ -68,8 +68,8 @@ public final class FavoriteModel {
     /// 言語フィルタ（nil = フィルタ無し）
     /// 現在のお気に入りに存在しない言語が指定されている場合は nil（フィルタ無し）として扱う
     public var filterLanguage: String? {
-        guard let language = storedFilterLanguage,
-              favoriteStore.favorites.contains(where: { $0.language == language }) else { return nil }
+        guard let language = storedFilterLanguage else { return nil }
+        guard favoriteStore.favorites.contains(where: { $0.language == language }) else { return nil }
         return language
     }
     private var storedFilterLanguage: String?
@@ -101,7 +101,9 @@ public final class FavoriteModel {
             Logger.favorite.info("Favorite removed: id=\(favorite.id, privacy: .public)")
             resetStaleSelectionState()
         } catch {
-            Logger.favorite.error("Favorite remove failed: id=\(favorite.id, privacy: .public), error=\(error.localizedDescription, privacy: .public)")
+            Logger.favorite.error(
+                "Favorite remove failed: id=\(favorite.id, privacy: .public), error=\(error.localizedDescription, privacy: .public)"
+            )
             errorMessage = String(localized: "お気に入りの削除に失敗しました", bundle: #bundle)
             isErrorPresented = true
         }
@@ -177,7 +179,9 @@ public final class FavoriteModel {
     /// 編集モード TopBar 左に出すボタンのタイトル。
     /// View は状態を表示するだけの Passive View に保つため、条件による文言の出し分けは Model が持つ。
     public var selectAllButtonTitle: String {
-        isAllSelected ? String(localized: "全解除", bundle: #bundle) : String(localized: "全選択", bundle: #bundle)
+        isAllSelected
+            ? String(localized: "全解除", bundle: #bundle)
+            : String(localized: "全選択", bundle: #bundle)
     }
 
     public func requestRemoveSelected() {
@@ -237,7 +241,9 @@ public final class FavoriteModel {
         case .starCountDesc:
             return filtered.sorted { $0.starCount > $1.starCount }
         case .fullNameAsc:
-            return filtered.sorted { $0.fullName.localizedStandardCompare($1.fullName) == .orderedAscending }
+            return filtered.sorted {
+                $0.fullName.localizedStandardCompare($1.fullName) == .orderedAscending
+            }
         }
     }
 

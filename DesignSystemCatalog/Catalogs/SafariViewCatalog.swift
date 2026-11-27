@@ -11,7 +11,7 @@ struct SafariViewCatalog: View {
     private let sampleURL = URL(string: "https://github.com")!
 
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: Spacing.spacing300) {
             Text("SafariView は SFSafariViewController を SwiftUI でラップする。")
                 .font(.body)
                 .foregroundStyle(.secondary)

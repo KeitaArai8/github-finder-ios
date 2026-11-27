@@ -342,7 +342,11 @@ struct SearchModelTests {
         let page1Repo = TestData.makeRepository(id: 1, fullName: "page1/repo")
         let page2Repo = TestData.makeRepository(id: 2, fullName: "page2/repo")
         mockSearch.searchResult = .success(
-            TestData.makeSearchResult(items: [page1Repo], totalCount: 60, hasNextPage: true)
+            TestData.makeSearchResult(
+                items: [page1Repo],
+                totalCount: 60,
+                hasNextPage: true
+            )
         )
         let model = SearchModelTests.makeModel(searchRepository: mockSearch)
         model.searchQuery = "test"
@@ -392,7 +396,11 @@ struct SearchModelTests {
         let mockSearch = MockSearchRepository()
         let repo = TestData.makeRepository(id: 1, fullName: "page1/repo")
         mockSearch.searchResult = .success(
-            TestData.makeSearchResult(items: [repo], totalCount: 60, hasNextPage: true)
+            TestData.makeSearchResult(
+                items: [repo],
+                totalCount: 60,
+                hasNextPage: true
+            )
         )
         let model = SearchModelTests.makeModel(searchRepository: mockSearch)
         model.searchQuery = "test"
@@ -528,7 +536,11 @@ struct SearchModelTests {
         let mockSearch = MockSearchRepository()
         let repo = TestData.makeRepository(id: 1)
         mockSearch.searchResult = .success(
-            TestData.makeSearchResult(items: [repo], totalCount: 60, hasNextPage: true)
+            TestData.makeSearchResult(
+                items: [repo],
+                totalCount: 60,
+                hasNextPage: true
+            )
         )
         let model = SearchModelTests.makeModel(searchRepository: mockSearch)
         model.searchQuery = "test"

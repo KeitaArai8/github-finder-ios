@@ -64,33 +64,37 @@ struct CoachMarkOverlay: View {
 
     // MARK: - Tooltip
 
+    // 10pt・6pt は対応する Spacing トークンが無いため直接指定する
     private var tooltipCard: some View {
         VStack(spacing: 10) {
-            HStack(spacing: 8) {
+            HStack(spacing: Spacing.spacing100) {
                 Image(systemName: step.systemImage)
-                    .font(.headline)
+                    .font(.appTitleSmall)
                     .foregroundStyle(.blue)
                 Text(step.title)
-                    .font(.headline)
+                    .font(.appTitleSmall)
             }
             Text(step.description)
-                .font(.subheadline)
+                .font(.appBodyMedium)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
 
-            HStack(spacing: 8) {
+            HStack(spacing: Spacing.spacing100) {
                 stepIndicator
                 Spacer()
                 Button {
                     onNext()
                 } label: {
-                    Text(isLastStep ? LocalizedStringResource("はじめる", bundle: #bundle) : LocalizedStringResource("次へ", bundle: #bundle))
-                        .font(.subheadline.bold())
+                    Text(isLastStep
+                        ? LocalizedStringResource("はじめる", bundle: #bundle)
+                        : LocalizedStringResource("次へ", bundle: #bundle)
+                    )
+                        .font(.appBodyMedium.bold())
                 }
                 .buttonStyle(.glassProminent)
             }
         }
-        .padding(16)
+        .padding(.all, Spacing.spacing200)
         // 吹き出しはコンテンツの上に浮く操作要素なので Liquid Glass。ボタンの glass と融合させるため同じ container に入れる
         .glassEffect(.regular, in: .rect(cornerRadius: Radius.radius200))
     }
@@ -111,7 +115,7 @@ struct CoachMarkOverlay: View {
         Button(LocalizedStringResource("スキップ", bundle: #bundle)) {
             onSkip()
         }
-        .font(.caption.bold())
+        .font(.appLabelMedium.bold())
         .foregroundStyle(Color(.label))
         .buttonStyle(.glass)
     }
@@ -132,13 +136,28 @@ struct CoachMarkOverlay: View {
         switch step {
         case .searchBar:
             // NavigationTitle 直下の searchable TextField を想定した矩形
-            return CGRect(x: 16, y: 180, width: screen.width - 32, height: 40)
+            return CGRect(
+                x: 16,
+                y: 180,
+                width: screen.width - 32,
+                height: 40
+            )
         case .favoriteButton:
             // リスト内先頭行のハートボタン位置を想定
-            return CGRect(x: screen.width - 70, y: 260, width: 44, height: 44)
+            return CGRect(
+                x: screen.width - 70,
+                y: 260,
+                width: 44,
+                height: 44
+            )
         case .favoriteTab:
             let tabWidth = screen.width / 3
-            return CGRect(x: tabWidth, y: screen.height - 90, width: tabWidth, height: 50)
+            return CGRect(
+                x: tabWidth,
+                y: screen.height - 90,
+                width: tabWidth,
+                height: 50
+            )
         }
     }
 

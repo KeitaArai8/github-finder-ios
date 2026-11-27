@@ -32,7 +32,10 @@ public struct FavoriteListView: View {
                     Text(model.errorMessage ?? "")
                 }
                 .confirmationDialog(
-                    LocalizedStringResource("\(model.selectedIDs.count)件のお気に入りを削除しますか？", bundle: #bundle),
+                    LocalizedStringResource(
+                        "\(model.selectedIDs.count)件のお気に入りを削除しますか？",
+                        bundle: #bundle
+                    ),
                     isPresented: $model.isDeleteConfirmationPresented,
                     titleVisibility: .visible
                 ) {
@@ -50,7 +53,9 @@ public struct FavoriteListView: View {
     }
 
     private var navigationTitle: LocalizedStringResource {
-        model.isEditMode ? LocalizedStringResource("\(model.selectedIDs.count)件選択", bundle: #bundle) : LocalizedStringResource("お気に入り", bundle: #bundle)
+        model.isEditMode
+            ? LocalizedStringResource("\(model.selectedIDs.count)件選択", bundle: #bundle)
+            : LocalizedStringResource("お気に入り", bundle: #bundle)
     }
 
     // MARK: - Toolbar
@@ -143,7 +148,12 @@ public struct FavoriteListView: View {
 
         case .empty:
             ContentUnavailableView(
-                label: { Label(LocalizedStringResource("お気に入りがありません", bundle: #bundle), systemImage: "heart.slash") },
+                label: {
+                    Label(
+                        LocalizedStringResource("お気に入りがありません", bundle: #bundle),
+                        systemImage: "heart.slash"
+                    )
+                },
                 description: { Text("検索画面からリポジトリを\nお気に入りに追加しましょう", bundle: #bundle) }
             )
 
@@ -164,26 +174,7 @@ public struct FavoriteListView: View {
             }
             List {
                 ForEach(favorites) { favorite in
-                    Button {
-                        if model.isEditMode {
-                            model.toggleSelection(id: favorite.id)
-                        } else {
-                            safariDestination = makeGitHubURL(fullName: favorite.fullName).map(SafariDestination.init(url:))
-                        }
-                    } label: {
-                        FavoriteRow(
-                            favorite: favorite,
-                            isEditMode: model.isEditMode,
-                            isSelected: selectedIDs.contains(favorite.id)
-                        )
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    // 通常モード時のみシェア可能（編集モード中は contextMenu 衝突回避）
-                    .modifier(FavoriteRowShareModifier(
-                        favorite: favorite,
-                        isEditMode: model.isEditMode
-                    ))
+                    favoriteRowButton(favorite, isSelected: selectedIDs.contains(favorite.id))
                 }
                 .onDelete(perform: model.isEditMode ? nil : { indexSet in
                     let targets = indexSet.map { favorites[$0] }
@@ -202,12 +193,41 @@ public struct FavoriteListView: View {
                 // フィルタ後に該当0件の場合のメッセージ
                 if favorites.isEmpty {
                     ContentUnavailableView(
-                        label: { Label(LocalizedStringResource("該当するリポジトリがありません", bundle: #bundle), systemImage: "line.3.horizontal.decrease.circle") },
+                        label: {
+                            Label(
+                                LocalizedStringResource("該当するリポジトリがありません", bundle: #bundle),
+                                systemImage: "line.3.horizontal.decrease.circle"
+                            )
+                        },
                         description: { Text("フィルタを変更してください", bundle: #bundle) }
                     )
                 }
             }
         }
+    }
+
+    private func favoriteRowButton(_ favorite: FavoriteEntity, isSelected: Bool) -> some View {
+        Button {
+            if model.isEditMode {
+                model.toggleSelection(id: favorite.id)
+            } else {
+                safariDestination = makeGitHubURL(fullName: favorite.fullName)
+                    .map(SafariDestination.init(url:))
+            }
+        } label: {
+            FavoriteRow(
+                favorite: favorite,
+                isEditMode: model.isEditMode,
+                isSelected: isSelected
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        // 通常モード時のみシェア可能（編集モード中は contextMenu 衝突回避）
+        .modifier(FavoriteRowShareModifier(
+            favorite: favorite,
+            isEditMode: model.isEditMode
+        ))
     }
 
     @ViewBuilder
@@ -283,14 +303,20 @@ private struct FavoriteRowShareModifier: ViewModifier {
                 .contextMenu {
                     if let url = makeGitHubURL(fullName: favorite.fullName) {
                         ShareLink(item: url) {
-                            Label(LocalizedStringResource("リポジトリをシェア", bundle: #bundle), systemImage: "square.and.arrow.up")
+                            Label(
+                                LocalizedStringResource("リポジトリをシェア", bundle: #bundle),
+                                systemImage: "square.and.arrow.up"
+                            )
                         }
                     }
                 }
                 .swipeActions(edge: .leading, allowsFullSwipe: false) {
                     if let url = makeGitHubURL(fullName: favorite.fullName) {
                         ShareLink(item: url) {
-                            Label(LocalizedStringResource("シェア", bundle: #bundle), systemImage: "square.and.arrow.up")
+                            Label(
+                                LocalizedStringResource("シェア", bundle: #bundle),
+                                systemImage: "square.and.arrow.up"
+                            )
                         }
                         .tint(Color.Content.accent)
                     }
@@ -307,12 +333,15 @@ private struct FavoriteRow: View {
     let isSelected: Bool
 
     var body: some View {
-        HStack(alignment: .center, spacing: Spacing.spacing150) {
+        HStack(spacing: Spacing.spacing150) {
             if isEditMode {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .font(.title3)
                     .foregroundStyle(isSelected ? Color.Content.accent : Color.Content.tertiary)
-                    .accessibilityLabel(isSelected ? Text("選択済み", bundle: #bundle) : Text("未選択", bundle: #bundle))
+                    .accessibilityLabel(isSelected
+                        ? Text("選択済み", bundle: #bundle)
+                        : Text("未選択", bundle: #bundle)
+                    )
             }
             RepositorySummaryView(
                 fullName: favorite.fullName,
@@ -354,7 +383,7 @@ private func makePreviewFavoriteModel(
     return model
 }
 
-private func previewFavorites() -> [FavoriteEntity] {
+private func makePreviewFavorites() -> [FavoriteEntity] {
     [
         FavoriteEntity(
             id: 1,
@@ -387,12 +416,12 @@ private func previewFavorites() -> [FavoriteEntity] {
 }
 
 #Preview("Loaded") {
-    FavoriteListView(model: makePreviewFavoriteModel(favorites: previewFavorites()))
+    FavoriteListView(model: makePreviewFavoriteModel(favorites: makePreviewFavorites()))
 }
 
 #Preview("Edit Mode（2件選択中）") {
     FavoriteListView(model: makePreviewFavoriteModel(
-        favorites: previewFavorites(),
+        favorites: makePreviewFavorites(),
         isEditMode: true,
         selectedIDs: [1, 2]
     ))

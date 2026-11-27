@@ -78,7 +78,12 @@ struct SearchRepositoryImplTests {
         // Arrange: 403 を返すモック
         MockURLProtocolForRepository.reset()
         MockURLProtocolForRepository.requestHandler = { request in
-            (HTTPURLResponse(url: request.url!, statusCode: 403, httpVersion: nil, headerFields: nil)!, Data())
+            (HTTPURLResponse(
+                url: request.url!,
+                statusCode: 403,
+                httpVersion: nil,
+                headerFields: nil
+            )!, Data())
         }
         let repository = makeRepository()
 
@@ -124,7 +129,12 @@ struct SearchRepositoryImplTests {
         MockURLProtocolForRepository.reset()
         MockURLProtocolForRepository.requestHandler = { request in
             let invalid = "not json".data(using: .utf8)!
-            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, invalid)
+            return (HTTPURLResponse(
+                url: request.url!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            )!, invalid)
         }
         let repository = makeRepository()
 
@@ -162,7 +172,12 @@ extension SearchRepositoryImplTests {
         }
         """.data(using: .utf8)!
         MockURLProtocolForRepository.requestHandler = { request in
-            (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, json)
+            (HTTPURLResponse(
+                url: request.url!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            )!, json)
         }
     }
 }

@@ -14,7 +14,11 @@ public actor SearchCacheDataSource {
         cache[cacheKey(query: query, page: page)]
     }
 
-    public func set(query: String, page: Int, result: SearchResultEntity) {
+    public func set(
+        query: String,
+        page: Int,
+        result: SearchResultEntity
+    ) {
         cache[cacheKey(query: query, page: page)] = result
     }
 

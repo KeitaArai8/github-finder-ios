@@ -9,7 +9,7 @@ import GitHubFinderDesignSystem
 struct ErrorViewCatalog: View {
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: Spacing.spacing300) {
                 catalogItem(title: "Network Error") {
                     ErrorView(message: "ネットワークに接続できません", onRetry: {})
                 }
@@ -30,7 +30,7 @@ struct ErrorViewCatalog: View {
 
     @ViewBuilder
     private func catalogItem<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: Spacing.spacing100) {
             Text(title).font(.caption).foregroundStyle(.secondary)
             content()
                 .frame(height: 200)

@@ -32,7 +32,7 @@ struct FavoriteModelTests {
         mockFavorite.favorites = [TestData.makeFavorite(id: 1)]
         let model = FavoriteModelTests.makeModel(favoriteRepository: mockFavorite)
 
-        // Act: onAppearでデータ読み込み
+        // Act: load() でデータ読み込み
         await model.load()
 
         // Assert: loaded状態で1件表示
@@ -50,7 +50,7 @@ struct FavoriteModelTests {
         mockFavorite.favorites = []
         let model = FavoriteModelTests.makeModel(favoriteRepository: mockFavorite)
 
-        // Act: onAppearでデータ読み込み
+        // Act: load() でデータ読み込み
         await model.load()
 
         // Assert: empty状態
@@ -450,9 +450,21 @@ struct FavoriteModelTests {
         let newDate = Date(timeIntervalSince1970: 3_000)
         let mockFavorite = MockFavoriteRepository()
         mockFavorite.favorites = [
-            TestData.makeFavorite(id: 1, fullName: "owner/old", savedAt: oldDate),
-            TestData.makeFavorite(id: 2, fullName: "owner/mid", savedAt: midDate),
-            TestData.makeFavorite(id: 3, fullName: "owner/new", savedAt: newDate),
+            TestData.makeFavorite(
+                id: 1,
+                fullName: "owner/old",
+                savedAt: oldDate
+            ),
+            TestData.makeFavorite(
+                id: 2,
+                fullName: "owner/mid",
+                savedAt: midDate
+            ),
+            TestData.makeFavorite(
+                id: 3,
+                fullName: "owner/new",
+                savedAt: newDate
+            ),
         ]
         let model = FavoriteModelTests.makeModel(favoriteRepository: mockFavorite)
 
@@ -473,9 +485,21 @@ struct FavoriteModelTests {
         // Arrange: starCount が異なる 3 件
         let mockFavorite = MockFavoriteRepository()
         mockFavorite.favorites = [
-            TestData.makeFavorite(id: 1, fullName: "a/repo", starCount: 100),
-            TestData.makeFavorite(id: 2, fullName: "b/repo", starCount: 5_000),
-            TestData.makeFavorite(id: 3, fullName: "c/repo", starCount: 500),
+            TestData.makeFavorite(
+                id: 1,
+                fullName: "a/repo",
+                starCount: 100
+            ),
+            TestData.makeFavorite(
+                id: 2,
+                fullName: "b/repo",
+                starCount: 5_000
+            ),
+            TestData.makeFavorite(
+                id: 3,
+                fullName: "c/repo",
+                starCount: 500
+            ),
         ]
         let model = FavoriteModelTests.makeModel(favoriteRepository: mockFavorite)
         await model.load()
@@ -521,9 +545,21 @@ struct FavoriteModelTests {
         // Arrange: Swift と Kotlin のお気に入りが混在
         let mockFavorite = MockFavoriteRepository()
         mockFavorite.favorites = [
-            TestData.makeFavorite(id: 1, fullName: "a/swift1", language: "Swift"),
-            TestData.makeFavorite(id: 2, fullName: "b/kotlin1", language: "Kotlin"),
-            TestData.makeFavorite(id: 3, fullName: "c/swift2", language: "Swift"),
+            TestData.makeFavorite(
+                id: 1,
+                fullName: "a/swift1",
+                language: "Swift"
+            ),
+            TestData.makeFavorite(
+                id: 2,
+                fullName: "b/kotlin1",
+                language: "Kotlin"
+            ),
+            TestData.makeFavorite(
+                id: 3,
+                fullName: "c/swift2",
+                language: "Swift"
+            ),
         ]
         let model = FavoriteModelTests.makeModel(favoriteRepository: mockFavorite)
         await model.load()

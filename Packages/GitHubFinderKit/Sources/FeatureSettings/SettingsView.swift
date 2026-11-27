@@ -21,18 +21,24 @@ public struct SettingsView: View {
                     Button {
                         safariDestination = SafariDestination(url: privacyPolicyURL)
                     } label: {
-                        Label(LocalizedStringResource("プライバシーポリシー", bundle: #bundle), systemImage: "hand.raised")
+                        Label(
+                            LocalizedStringResource("プライバシーポリシー", bundle: #bundle),
+                            systemImage: "hand.raised"
+                        )
                     }
 
                     Button {
                         safariDestination = SafariDestination(url: termsURL)
                     } label: {
-                        Label(LocalizedStringResource("利用規約", bundle: #bundle), systemImage: "doc.text")
+                        Label(
+                            LocalizedStringResource("利用規約", bundle: #bundle),
+                            systemImage: "doc.text"
+                        )
                     }
                 }
 
                 Section(LocalizedStringResource("アプリ情報", bundle: #bundle)) {
-                    HStack {
+                    HStack(spacing: 0) {
                         Text("バージョン", bundle: #bundle)
                         Spacer()
                         Text(appVersion)

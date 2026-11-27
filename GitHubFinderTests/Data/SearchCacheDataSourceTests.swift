@@ -27,7 +27,11 @@ struct SearchCacheDataSourceTests {
         // Arrange: totalCount=10, items=5件の結果をキャッシュに保存
         let cache = SearchCacheDataSource()
         let expected = makeResult(totalCount: 10, itemCount: 5)
-        await cache.set(query: "swift", page: 1, result: expected)
+        await cache.set(
+            query: "swift",
+            page: 1,
+            result: expected
+        )
 
         // Act: 同じキーで取得
         let actual = await cache.get(query: "swift", page: 1)
@@ -43,8 +47,16 @@ struct SearchCacheDataSourceTests {
         let cache = SearchCacheDataSource()
         let page1 = makeResult(totalCount: 60, itemCount: 30)
         let page2 = makeResult(totalCount: 60, itemCount: 30)
-        await cache.set(query: "swift", page: 1, result: page1)
-        await cache.set(query: "swift", page: 2, result: page2)
+        await cache.set(
+            query: "swift",
+            page: 1,
+            result: page1
+        )
+        await cache.set(
+            query: "swift",
+            page: 2,
+            result: page2
+        )
 
         // Act & Assert: 各ページが独立して取得できる
         #expect(await cache.get(query: "swift", page: 1)?.items.count == 30)
@@ -56,7 +68,11 @@ struct SearchCacheDataSourceTests {
         // Arrange: "Swift"（大文字始まり）で保存
         let cache = SearchCacheDataSource()
         let result = makeResult(totalCount: 1, itemCount: 1)
-        await cache.set(query: "Swift", page: 1, result: result)
+        await cache.set(
+            query: "Swift",
+            page: 1,
+            result: result
+        )
 
         // Act & Assert: "swift"（小文字）/ "SWIFT"（全大文字）でも取得可能
         #expect(await cache.get(query: "swift", page: 1) != nil)
@@ -78,6 +94,10 @@ extension SearchCacheDataSourceTests {
                 ownerAvatarURL: nil
             )
         }
-        return SearchResultEntity(totalCount: totalCount, items: items, hasNextPage: false)
+        return SearchResultEntity(
+            totalCount: totalCount,
+            items: items,
+            hasNextPage: false
+        )
     }
 }

@@ -26,7 +26,9 @@ struct GitHubFinderApp: App {
         do {
             container = try AppGroupContainer.makeModelContainer()
         } catch {
-            fatalError("Failed to create App Group ModelContainer. Check entitlements for \(AppGroupContainer.identifier): \(error)")
+            fatalError(
+                "Failed to create App Group ModelContainer. Check entitlements for \(AppGroupContainer.identifier): \(error)"
+            )
         }
 
         // DataSources

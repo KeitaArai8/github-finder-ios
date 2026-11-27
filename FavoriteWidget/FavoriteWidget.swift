@@ -36,8 +36,11 @@ struct FavoriteTimelineProvider: TimelineProvider {
         let favorites = loadFavorites()
         let entry = FavoriteTimelineEntry(date: Date(), favorites: favorites)
         // 1時間後の更新時刻。nil はカレンダー算出失敗時のみなので 3600秒 加算にフォールバック
-        let nextRefresh = Calendar.current.date(byAdding: .hour, value: 1, to: Date())
-            ?? Date().addingTimeInterval(3600)
+        let nextRefresh = Calendar.current.date(
+            byAdding: .hour,
+            value: 1,
+            to: Date()
+        ) ?? Date().addingTimeInterval(3600)
         let timeline = Timeline(entries: [entry], policy: .after(nextRefresh))
         completion(timeline)
     }
@@ -59,6 +62,7 @@ struct FavoriteTimelineProvider: TimelineProvider {
 
 // MARK: - Entry View
 
+// Widget Extension は GitHubFinderDesignSystem をリンクしないため、余白・色・フォントはトークンを使わず直接指定する
 struct FavoriteWidgetEntryView: View {
     var entry: FavoriteTimelineEntry
     @Environment(\.widgetFamily) var widgetFamily
