@@ -2,6 +2,8 @@
 //
 // GitHubFinderKit
 // Now in Android (NiA) 風のモジュール分割を iOS で実現するための local Swift Package。
+// 倣っているのは core 相当の層（Domain / Data / DesignSystem）と feature を別 target に分ける点。
+// 依存の向きは NiA（`:core:domain` が `:core:data` に依存）と異なり、Data が Domain に依存する。
 // アプリ本体（Xcode App target）からは複数の library product を import する。
 // レイヤ依存:
 //   Domain ← Data ← Feature*

@@ -49,7 +49,12 @@ struct FavoriteRepositoryImplTests {
 extension FavoriteRepositoryImplTests {
     fileprivate func makeRepository() throws -> FavoriteRepositoryImpl {
         let schema = Schema([FavoriteRecord.self])
-        let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        // テストは並列に走るため、コンテナごとに一意な名前を付ける
+        let config = ModelConfiguration(
+            UUID().uuidString,
+            schema: schema,
+            isStoredInMemoryOnly: true
+        )
         let container = try ModelContainer(for: schema, configurations: config)
         return FavoriteRepositoryImpl(
             localDataSource: FavoriteLocalDataSource(modelContainer: container)

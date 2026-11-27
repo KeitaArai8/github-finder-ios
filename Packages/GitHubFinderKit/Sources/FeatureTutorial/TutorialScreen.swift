@@ -67,9 +67,9 @@ public struct TutorialScreen: View {
     private var mockSearchBar: some View {
         HStack(spacing: Spacing.spacing100) {
             Image(systemName: "magnifyingglass")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.Content.secondary)
             Text("リポジトリを検索", bundle: #bundle)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.Content.secondary)
             Spacer()
         }
         .padding(.horizontal, Spacing.spacing150)
@@ -95,12 +95,12 @@ public struct TutorialScreen: View {
                     .font(.appTitleSmall)
                 Text(mockRepo.description)
                     .font(.appBodyMedium)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.Content.secondary)
                 HStack(spacing: Spacing.spacing150) {
                     Label("\(mockRepo.starCount)", systemImage: "star.fill")
                         .foregroundStyle(Color.Brand.star)
                     Text(mockRepo.language)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.Content.secondary)
                 }
                 .font(.appLabelMedium)
             }

@@ -132,7 +132,7 @@ public struct SearchView: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(query)
-            .accessibilityHint(Text("ダブルタップでこのキーワードを再検索", bundle: #bundle))
+            .accessibilityHint(Text("このキーワードを再検索します", bundle: #bundle))
 
             Button {
                 model.removeHistory(query)
@@ -266,7 +266,7 @@ private struct RepositoryRow: View {
             )
         )
         .accessibilityHint(Text(
-            "ダブルタップで切り替え",
+            "お気に入りの登録状態を切り替えます",
             bundle: #bundle,
             comment: "Accessibility hint for favorite toggle"
         ))

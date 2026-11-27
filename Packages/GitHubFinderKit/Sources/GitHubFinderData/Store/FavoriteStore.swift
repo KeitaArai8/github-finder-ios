@@ -1,7 +1,6 @@
 /*
  Abstract:
  お気に入り状態を一元管理する共有ストア。SearchModel と FavoriteModel の両方がこのストアを参照する。
- NiA の `:core:data` における `FavoriteStore` 同等の役割。
  */
 
 import Foundation
