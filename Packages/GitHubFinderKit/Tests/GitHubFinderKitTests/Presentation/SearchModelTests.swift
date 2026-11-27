@@ -482,6 +482,31 @@ struct SearchModelTests {
 
     // MARK: - リフレッシュ
 
+    @Test("onLoadMore は入力中の文字列ではなく、表示中の一覧を取得したクエリで次ページを取る")
+    func loadMoreUsesSearchedQueryNotTypedText() async {
+        // Arrange: "swift" で検索済み（次ページあり）のあと、検索ボックスだけ "kotlin" に書き換えた状態
+        let mockSearch = MockSearchRepository()
+        let page1Repo = TestData.makeRepository(id: 1, fullName: "swift/page1")
+        mockSearch.searchResult = .success(
+            TestData.makeSearchResult(
+                items: [page1Repo],
+                totalCount: 60,
+                hasNextPage: true
+            )
+        )
+        let model = SearchModelTests.makeModel(searchRepository: mockSearch)
+        model.searchQuery = "swift"
+        await model.search()
+        model.searchQuery = "kotlin"
+
+        // Act: 一覧の末尾に達して次ページを読み込む
+        await model.onLoadMore()
+
+        // Assert: 次ページは "swift" の page=2 として取得される
+        #expect(mockSearch.lastSearchQuery == "swift")
+        #expect(mockSearch.lastSearchPage == 2)
+    }
+
     @Test("onRefreshで再検索が実行され結果が更新される")
     func onRefreshReloadsData() async {
         // Arrange: 初回検索
@@ -504,6 +529,25 @@ struct SearchModelTests {
         }
         #expect(items.count == 1)
         #expect(items[0].fullName == "new/repo")
+    }
+
+    @Test("通常の検索は forceRefresh なし、onRefresh は forceRefresh ありでリポジトリを呼ぶ")
+    func onRefreshBypassesCache() async {
+        // Arrange: 検索結果1件を返すモックで初回検索
+        let mockSearch = MockSearchRepository()
+        let repo = TestData.makeRepository(id: 1)
+        mockSearch.searchResult = .success(TestData.makeSearchResult(items: [repo]))
+        let model = SearchModelTests.makeModel(searchRepository: mockSearch)
+        model.searchQuery = "test"
+        await model.search()
+        let forceRefreshOnSearch = mockSearch.lastForceRefresh
+
+        // Act: 引っ張って更新
+        await model.onRefresh()
+
+        // Assert: 初回検索はキャッシュを使ってよく、更新はキャッシュを使わない
+        #expect(forceRefreshOnSearch == false)
+        #expect(mockSearch.lastForceRefresh == true)
     }
 
     // MARK: - hasNextPage=false時のonLoadMore

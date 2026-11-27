@@ -20,7 +20,11 @@ struct SearchRepositoryImplTests {
         let repository = makeRepository()
 
         // Act: 初回検索を実行
-        _ = try await repository.search(query: "swift", page: 1)
+        _ = try await repository.search(
+            query: "swift",
+            page: 1,
+            forceRefresh: false
+        )
 
         // Assert: Remote が1回呼ばれる
         #expect(MockURLProtocolForRepository.callCount == 1)
@@ -34,11 +38,75 @@ struct SearchRepositoryImplTests {
         let repository = makeRepository()
 
         // Act: 同じクエリ/ページで2回検索
-        _ = try await repository.search(query: "swift", page: 1)
-        _ = try await repository.search(query: "swift", page: 1)
+        _ = try await repository.search(
+            query: "swift",
+            page: 1,
+            forceRefresh: false
+        )
+        _ = try await repository.search(
+            query: "swift",
+            page: 1,
+            forceRefresh: false
+        )
 
         // Assert: Remote は1回しか呼ばれない（キャッシュヒット）
         #expect(MockURLProtocolForRepository.callCount == 1)
+    }
+
+    @Test("forceRefresh のときはキャッシュがあってもリモートを呼ぶ")
+    func forceRefreshIgnoresCache() async throws {
+        // Arrange: 1 回検索してキャッシュ済みの Repository
+        MockURLProtocolForRepository.reset()
+        setupSuccessfulJSON(totalCount: 1)
+        let repository = makeRepository()
+        _ = try await repository.search(
+            query: "swift",
+            page: 1,
+            forceRefresh: false
+        )
+
+        // Act: 同じクエリ/ページを forceRefresh で検索
+        _ = try await repository.search(
+            query: "swift",
+            page: 1,
+            forceRefresh: true
+        )
+
+        // Assert: キャッシュを使わず Remote が2回呼ばれる
+        #expect(MockURLProtocolForRepository.callCount == 2)
+    }
+
+    @Test("forceRefresh は同じクエリの後続ページのキャッシュも破棄する")
+    func forceRefreshDropsCachedLaterPages() async throws {
+        // Arrange: page=1 と page=2 をキャッシュ済みの Repository
+        MockURLProtocolForRepository.reset()
+        setupSuccessfulJSON(totalCount: 60)
+        let repository = makeRepository()
+        _ = try await repository.search(
+            query: "swift",
+            page: 1,
+            forceRefresh: false
+        )
+        _ = try await repository.search(
+            query: "swift",
+            page: 2,
+            forceRefresh: false
+        )
+
+        // Act: page=1 を forceRefresh で取り直し、続けて page=2 を通常の検索で取る
+        _ = try await repository.search(
+            query: "swift",
+            page: 1,
+            forceRefresh: true
+        )
+        _ = try await repository.search(
+            query: "swift",
+            page: 2,
+            forceRefresh: false
+        )
+
+        // Assert: page=2 も古いキャッシュではなく Remote から取り直される（計4回）
+        #expect(MockURLProtocolForRepository.callCount == 4)
     }
 
     @Test("異なるページの検索はキャッシュミスしリモートを呼ぶ")
@@ -49,8 +117,16 @@ struct SearchRepositoryImplTests {
         let repository = makeRepository()
 
         // Act: page=1 と page=2 を検索
-        _ = try await repository.search(query: "swift", page: 1)
-        _ = try await repository.search(query: "swift", page: 2)
+        _ = try await repository.search(
+            query: "swift",
+            page: 1,
+            forceRefresh: false
+        )
+        _ = try await repository.search(
+            query: "swift",
+            page: 2,
+            forceRefresh: false
+        )
 
         // Assert: Remote は2回呼ばれる
         #expect(MockURLProtocolForRepository.callCount == 2)
@@ -67,7 +143,11 @@ struct SearchRepositoryImplTests {
         let repository = makeRepository()
 
         // Act: page=1 で検索
-        let result = try await repository.search(query: "swift", page: 1)
+        let result = try await repository.search(
+            query: "swift",
+            page: 1,
+            forceRefresh: false
+        )
 
         // Assert: totalCount > page * 30 のときだけ hasNextPage が true
         #expect(result.hasNextPage == expected)
@@ -89,7 +169,11 @@ struct SearchRepositoryImplTests {
 
         // Act & Assert: AppError.rateLimit がそのまま透過
         await #expect(throws: AppError.rateLimit) {
-            _ = try await repository.search(query: "swift", page: 1)
+            _ = try await repository.search(
+                query: "swift",
+                page: 1,
+                forceRefresh: false
+            )
         }
     }
 
@@ -104,7 +188,11 @@ struct SearchRepositoryImplTests {
 
         // Act & Assert: AppError.network にマップされる
         await #expect(throws: AppError.network) {
-            _ = try await repository.search(query: "swift", page: 1)
+            _ = try await repository.search(
+                query: "swift",
+                page: 1,
+                forceRefresh: false
+            )
         }
     }
 
@@ -119,7 +207,11 @@ struct SearchRepositoryImplTests {
 
         // Act & Assert: CancellationError として伝播する
         await #expect(throws: CancellationError.self) {
-            _ = try await repository.search(query: "swift", page: 1)
+            _ = try await repository.search(
+                query: "swift",
+                page: 1,
+                forceRefresh: false
+            )
         }
     }
 
@@ -140,7 +232,11 @@ struct SearchRepositoryImplTests {
 
         // Act & Assert: AppError.decode にマップされる
         await #expect(throws: AppError.decode) {
-            _ = try await repository.search(query: "swift", page: 1)
+            _ = try await repository.search(
+                query: "swift",
+                page: 1,
+                forceRefresh: false
+            )
         }
     }
 }

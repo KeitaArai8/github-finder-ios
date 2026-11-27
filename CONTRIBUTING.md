@@ -74,7 +74,7 @@ Closes #42
 
 ## テスト
 
-- ViewModel / Model を変更する場合は **対応するテストを必ず追加・更新**
+- Model（State Holder）を変更する場合は **対応するテストを必ず追加・更新**
 - Data 層（Repository / DataSource）変更時も同様
 - テストは **Swift Testing** (`@Test`, `#expect`, `#require`) で記述
 - AAA パターン（`// Arrange:` / `// Act:` / `// Assert:`）のコメントを各テストに明記

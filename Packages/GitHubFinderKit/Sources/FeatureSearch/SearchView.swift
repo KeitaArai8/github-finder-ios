@@ -363,7 +363,11 @@ private func makePreviewItem(
 // MARK: - Preview 専用 Repository
 
 private nonisolated final class PreviewSearchRepository: SearchRepositoryProtocol {
-    func search(query: String, page: Int) async throws -> SearchResultEntity {
+    func search(
+        query: String,
+        page: Int,
+        forceRefresh: Bool
+    ) async throws -> SearchResultEntity {
         SearchResultEntity(
             totalCount: 0,
             items: [],

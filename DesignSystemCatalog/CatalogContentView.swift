@@ -22,18 +22,11 @@ struct CatalogContentView: View {
                     NavigationLink("ErrorView", destination: ErrorViewCatalog())
                     NavigationLink("OfflineBanner", destination: OfflineBannerCatalog())
                     NavigationLink("SafariView", destination: SafariViewCatalog())
-                }
-
-                Section("Display Models") {
-                    NavigationLink("RepositoryDisplayItem", destination: RepositoryDisplayItemCatalog())
+                    NavigationLink("RepositorySummaryView", destination: RepositorySummaryViewCatalog())
                 }
 
                 Section("State Containers") {
                     NavigationLink("ViewState", destination: ViewStateCatalog())
-                }
-
-                Section("Helpers") {
-                    NavigationLink("GitHubURL", destination: GitHubURLCatalog())
                 }
             }
             .navigationTitle("DS Catalog")

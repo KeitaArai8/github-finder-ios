@@ -77,14 +77,14 @@ struct GitHubRemoteDataSourceTests {
         #expect(queryItems.contains(URLQueryItem(name: "per_page", value: "30")))
     }
 
-    @Test("403応答でAppError.rateLimitが投げられる")
-    func rateLimitErrorMapping() async {
-        // Arrange: 403 を返すモック
+    @Test("403 と 429 の応答で AppError.rateLimit が投げられる", arguments: [403, 429])
+    func rateLimitErrorMapping(statusCode: Int) async {
+        // Arrange: 指定のステータスコードを返すモック
         MockURLProtocolForRemote.reset()
         MockURLProtocolForRemote.requestHandler = { request in
             (HTTPURLResponse(
                 url: request.url!,
-                statusCode: 403,
+                statusCode: statusCode,
                 httpVersion: nil,
                 headerFields: nil
             )!, Data())

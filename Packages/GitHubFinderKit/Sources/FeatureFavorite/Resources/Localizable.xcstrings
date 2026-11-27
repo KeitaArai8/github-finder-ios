@@ -113,6 +113,22 @@
         }
       }
     },
+    "お気に入りの読み込みに失敗しました" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to load favorites"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お気に入りの読み込みに失敗しました"
+          }
+        }
+      }
+    },
     "この操作は取り消せません。" : {
       "localizations" : {
         "en" : {

@@ -18,8 +18,15 @@ public final class SearchRepositoryImpl: SearchRepositoryProtocol, Sendable {
         self.cacheDataSource = cacheDataSource
     }
 
-    public func search(query: String, page: Int) async throws -> SearchResultEntity {
-        if let cached = await cacheDataSource.get(query: query, page: page) {
+    public func search(
+        query: String,
+        page: Int,
+        forceRefresh: Bool
+    ) async throws -> SearchResultEntity {
+        if forceRefresh {
+            // 取得し直すページより後ろの古いページが残ると、次ページの読み込みで新旧の結果が混ざる
+            await cacheDataSource.removeAll(query: query)
+        } else if let cached = await cacheDataSource.get(query: query, page: page) {
             return cached
         }
 

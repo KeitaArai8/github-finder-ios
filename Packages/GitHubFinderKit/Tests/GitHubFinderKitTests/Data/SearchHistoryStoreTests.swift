@@ -115,6 +115,7 @@ struct SearchHistoryStoreTests {
         // Arrange: 同じ Suite/Key を共有する 2 つのインスタンス
         let suite = "test.\(UUID().uuidString)"
         let userDefaults = UserDefaults(suiteName: suite)!
+        defer { userDefaults.removePersistentDomain(forName: suite) }
         let key = "history"
         let store1 = SearchHistoryStore(
             userDefaults: userDefaults,
