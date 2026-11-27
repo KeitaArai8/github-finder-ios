@@ -11,7 +11,7 @@ import GitHubFinderDesignSystem
 struct RepositoryDisplayItemCatalog: View {
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: Spacing.spacing200) {
                 Text("RepositoryDisplayItem は Entity + isFavorite を統合した Passive View 用構造体。")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -28,18 +28,18 @@ struct RepositoryDisplayItemCatalog: View {
 
     @ViewBuilder
     private func catalogItem(_ title: String, item: RepositoryDisplayItem) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: Spacing.spacing100) {
             Text(title).font(.caption).foregroundStyle(.secondary)
-            HStack(alignment: .center, spacing: 12) {
+            HStack(spacing: Spacing.spacing150) {
                 Color.gray.opacity(0.3)
                     .frame(width: 40, height: 40)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: Spacing.spacing50) {
                     Text(item.fullName).font(.headline).lineLimit(1)
                     if let desc = item.description {
                         Text(desc).font(.subheadline).foregroundStyle(.secondary).lineLimit(2)
                     }
-                    HStack(spacing: 12) {
+                    HStack(spacing: Spacing.spacing150) {
                         Label("\(item.starCount)", systemImage: "star.fill")
                             .foregroundStyle(.orange)
                         if let lang = item.language {

@@ -11,8 +11,8 @@ struct GitHubURLCatalog: View {
     @State private var input = "apple/swift"
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: Spacing.spacing300) {
+            VStack(alignment: .leading, spacing: Spacing.spacing100) {
                 Text("Input").font(.caption).foregroundStyle(.secondary)
                 TextField("owner/repo", text: $input)
                     .textFieldStyle(.roundedBorder)
@@ -20,7 +20,7 @@ struct GitHubURLCatalog: View {
                     .textInputAutocapitalization(.never)
             }
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: Spacing.spacing100) {
                 Text("Output").font(.caption).foregroundStyle(.secondary)
                 Text(makeGitHubURL(fullName: input)?.absoluteString ?? "(invalid)")
                     .font(.subheadline.monospaced())
@@ -30,7 +30,7 @@ struct GitHubURLCatalog: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             }
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: Spacing.spacing100) {
                 Text("Common Cases").font(.caption).foregroundStyle(.secondary)
                 exampleRow(input: "apple/swift")
                 exampleRow(input: "user/repo with space")
@@ -45,7 +45,7 @@ struct GitHubURLCatalog: View {
     }
 
     private func exampleRow(input: String) -> some View {
-        HStack(alignment: .top, spacing: 8) {
+        HStack(alignment: .top, spacing: Spacing.spacing100) {
             Text(input.isEmpty ? "(empty)" : input)
                 .font(.caption.monospaced())
                 .frame(width: 120, alignment: .leading)

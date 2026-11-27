@@ -116,12 +116,20 @@ struct SearchHistoryStoreTests {
         let suite = "test.\(UUID().uuidString)"
         let userDefaults = UserDefaults(suiteName: suite)!
         let key = "history"
-        let store1 = SearchHistoryStore(userDefaults: userDefaults, storageKey: key, maxEntries: 10)
+        let store1 = SearchHistoryStore(
+            userDefaults: userDefaults,
+            storageKey: key,
+            maxEntries: 10
+        )
         store1.add("first")
         store1.add("second")
 
         // Act: 別インスタンスを作成（= 再起動シミュレーション）
-        let store2 = SearchHistoryStore(userDefaults: userDefaults, storageKey: key, maxEntries: 10)
+        let store2 = SearchHistoryStore(
+            userDefaults: userDefaults,
+            storageKey: key,
+            maxEntries: 10
+        )
 
         // Assert: 永続化された履歴が読み込まれる
         #expect(store2.history == ["second", "first"])

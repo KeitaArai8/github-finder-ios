@@ -8,7 +8,11 @@ import GitHubFinderDomain
 
 final class MockSearchRepository: SearchRepositoryProtocol, @unchecked Sendable {
     var searchResult: Result<SearchResultEntity, Error> = .success(
-        SearchResultEntity(totalCount: 0, items: [], hasNextPage: false)
+        SearchResultEntity(
+            totalCount: 0,
+            items: [],
+            hasNextPage: false
+        )
     )
     var searchCallCount = 0
     var lastSearchQuery: String?

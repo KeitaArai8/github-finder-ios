@@ -36,7 +36,7 @@ struct AppFontCatalog: View {
                     }
                 }
             }
-            .padding(Spacing.spacing200)
+            .padding(.all, Spacing.spacing200)
         }
         .navigationTitle("AppFont")
     }

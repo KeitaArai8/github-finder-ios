@@ -43,7 +43,7 @@ struct AppColorCatalog: View {
                     ("info", Color.Status.info),
                 ])
             }
-            .padding(Spacing.spacing200)
+            .padding(.all, Spacing.spacing200)
         }
         .navigationTitle("AppColor")
     }

@@ -8,13 +8,13 @@ import GitHubFinderDesignSystem
 
 struct OfflineBannerCatalog: View {
     var body: some View {
-        VStack(spacing: 24) {
-            VStack(alignment: .leading, spacing: 8) {
+        VStack(spacing: Spacing.spacing300) {
+            VStack(alignment: .leading, spacing: Spacing.spacing100) {
                 Text("Default").font(.caption).foregroundStyle(.secondary)
                 OfflineBanner()
             }
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: Spacing.spacing100) {
                 Text("On Background").font(.caption).foregroundStyle(.secondary)
                 ZStack(alignment: .top) {
                     Color(.systemBlue).opacity(0.1)

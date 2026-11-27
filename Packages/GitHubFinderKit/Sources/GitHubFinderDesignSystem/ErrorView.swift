@@ -16,7 +16,10 @@ public struct ErrorView: View {
 
     public var body: some View {
         ContentUnavailableView {
-            Label(LocalizedStringResource("エラー", bundle: #bundle), systemImage: "exclamationmark.triangle")
+            Label(
+                LocalizedStringResource("エラー", bundle: #bundle),
+                systemImage: "exclamationmark.triangle"
+            )
         } description: {
             Text(message)
         } actions: {
