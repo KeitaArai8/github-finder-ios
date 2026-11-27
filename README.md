@@ -63,6 +63,8 @@ Android公式に従い、各DataSourceは**単一のデータソースのみ**�
 | `SearchCacheDataSource` | 検索結果のメモリキャッシュ | Dictionary (actor) |
 | `TutorialLocalDataSource` | チュートリアルフラグ管理 | UserDefaults |
 
+`TutorialLocalDataSource` だけは Repository を挟まず、`CoachMarkManager` が直接保持します。`UserDefaults` の Bool を 1 つ読み書きするだけで、統合する DataSource もエラー変換も無いためです（`SearchHistoryStore` が `UserDefaults` を直接扱うのと同じ判断です）。Tutorial 機能でしか使わないので `FeatureTutorial` に置いています。
+
 `SearchRepositoryImpl` はリモートとキャッシュの 2 つの DataSource を統合し、エラー変換とキャッシュ制御を行います。`FavoriteRepositoryImpl` は `FavoriteLocalDataSource` へそのまま委譲します（エラーは変換しません）。
 
 ### SSOT（単一信頼源）
@@ -111,6 +113,8 @@ View → エラーメッセージ + リトライボタン表示
 ### DesignSystem トークン
 
 `GitHubFinderDesignSystem` は単なる UI コンポーネント置き場ではなく、**セマンティック・トークン**を提供する真のデザインシステム。各 View はハードコードされた `16` / `Color.gray` / `.font(.headline)` を直接使わず、**必ずトークンを経由**する。
+
+例外として、対応するトークンが無い値は View に直接書いている（トークンは増やしていない）: アイコンの `.font(.title3)`、チュートリアルの暗転 `Color.black.opacity(0.75)`・パルスリングの `Color.white`・吹き出しの `Color.blue`、チュートリアルのモック UI の `Color.gray`、10pt / 6pt / 2pt の間隔、14pt / 10pt の角丸、要素の位置・サイズの数値。`FavoriteWidget` は DesignSystem を import していないため、システムのフォントと色を直接指定している。
 
 | トークン | 場所 | 例 |
 |---------|------|-----|
@@ -308,7 +312,7 @@ GitHubFinderApp.init()
 | 機能 | 説明 |
 |------|------|
 | キーワード検索 | デバウンス付き（500ms）、GitHub API |
-| **検索履歴** | 直近10件を `UserDefaults` に永続化、Idle 時に履歴一覧 / 行タップで即時再検索 / 個別 swipe 削除 / 全消去 |
+| **検索履歴** | 直近10件を `UserDefaults` に永続化、Idle 時に履歴一覧 / 行タップで即時再検索 / 行末の X ボタンで個別削除 / 全消去 |
 | 無限スクロール | ページネーション対応（末尾3件手前でプリフェッチ） |
 | お気に入り登録/解除 | ハートボタン、SwiftData 永続化 |
 | お気に入り一覧 | スワイプ削除 / 行タップで GitHub ページを SafariView で開く |

@@ -33,6 +33,22 @@
         }
       }
     },
+    "GitHub ページを開きます" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens the GitHub page"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub ページを開きます"
+          }
+        }
+      }
+    },
     "OK" : {
       "localizations" : {
         "en" : {
@@ -205,38 +221,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "シェア"
-          }
-        }
-      }
-    },
-    "ダブルタップで GitHub ページを開く" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Double tap to open GitHub page"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ダブルタップで GitHub ページを開く"
-          }
-        }
-      }
-    },
-    "ダブルタップで選択/解除" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Double tap to select or deselect"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ダブルタップで選択/解除"
           }
         }
       }
@@ -495,6 +479,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択済み"
+          }
+        }
+      }
+    },
+    "選択状態を切り替えます" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggles the selection"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択状態を切り替えます"
           }
         }
       }

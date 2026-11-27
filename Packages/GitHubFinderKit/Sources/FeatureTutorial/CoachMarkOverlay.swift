@@ -13,7 +13,7 @@ struct CoachMarkOverlay: View {
     let onNext: () -> Void
     let onSkip: () -> Void
 
-    private let spotlightPadding: CGFloat = 12
+    private let spotlightPadding: CGFloat = Spacing.spacing150
     private let spotlightCornerRadius: CGFloat = 14
 
     var body: some View {
@@ -35,7 +35,7 @@ struct CoachMarkOverlay: View {
                 GlassEffectContainer {
                     tooltipCard
                 }
-                .frame(maxWidth: geo.size.width - 48)
+                .frame(maxWidth: geo.size.width - Spacing.spacing300 * 2)
                 .position(tooltipPosition(target: targetFrame, in: geo.size))
                 .animation(stepAnimation, value: step)
 
@@ -77,7 +77,7 @@ struct CoachMarkOverlay: View {
             Text(step.description)
                 .font(.appBodyMedium)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.Content.secondary)
 
             HStack(spacing: Spacing.spacing100) {
                 stepIndicator
@@ -103,7 +103,7 @@ struct CoachMarkOverlay: View {
         HStack(spacing: 6) {
             ForEach(CoachMarkManager.Step.allCases, id: \.rawValue) { s in
                 Circle()
-                    .fill(s == step ? Color.blue : Color.secondary.opacity(0.3))
+                    .fill(s == step ? Color.blue : Color.Content.secondary.opacity(0.3))
                     .frame(width: 6, height: 6)
             }
         }
@@ -116,7 +116,7 @@ struct CoachMarkOverlay: View {
             onSkip()
         }
         .font(.appLabelMedium.bold())
-        .foregroundStyle(Color(.label))
+        .foregroundStyle(Color.Content.primary)
         .buttonStyle(.glass)
     }
 
@@ -164,7 +164,7 @@ struct CoachMarkOverlay: View {
     /// 吹き出しの位置を対象UIの矩形から決定する。
     /// 対象が画面上半分にあるときは吹き出しを下、下半分にあるときは上に配置する。
     private func tooltipPosition(target: CGRect, in screen: CGSize) -> CGPoint {
-        let verticalGap: CGFloat = 24
+        let verticalGap: CGFloat = Spacing.spacing300
         let tooltipHeight: CGFloat = 140
         let isUpperHalf = target.midY < screen.height / 2
 
@@ -172,7 +172,10 @@ struct CoachMarkOverlay: View {
             ? target.maxY + verticalGap + tooltipHeight / 2
             : target.minY - verticalGap - tooltipHeight / 2
 
-        let clampedY = min(max(y, tooltipHeight / 2 + 16), screen.height - tooltipHeight / 2 - 16)
+        let clampedY = min(
+            max(y, tooltipHeight / 2 + Spacing.spacing200),
+            screen.height - tooltipHeight / 2 - Spacing.spacing200
+        )
         return CGPoint(x: screen.width / 2, y: clampedY)
     }
 

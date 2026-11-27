@@ -83,6 +83,39 @@
         }
       }
     },
+    "お気に入りの登録状態を切り替えます" : {
+      "comment" : "Accessibility hint for favorite toggle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggles whether the repository is a favorite"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お気に入りの登録状態を切り替えます"
+          }
+        }
+      }
+    },
+    "このキーワードを再検索します" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Searches for this keyword again"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このキーワードを再検索します"
+          }
+        }
+      }
+    },
     "すべて消去" : {
       "localizations" : {
         "en" : {
@@ -127,39 +160,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "キーワードを入力して\nGitHubリポジトリを探しましょう"
-          }
-        }
-      }
-    },
-    "ダブルタップでこのキーワードを再検索" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Double tap to search this keyword again"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ダブルタップでこのキーワードを再検索"
-          }
-        }
-      }
-    },
-    "ダブルタップで切り替え" : {
-      "comment" : "Accessibility hint for favorite toggle",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Double tap to toggle"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ダブルタップで切り替え"
           }
         }
       }

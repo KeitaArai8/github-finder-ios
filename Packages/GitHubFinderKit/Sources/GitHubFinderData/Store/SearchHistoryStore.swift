@@ -61,13 +61,13 @@ public final class SearchHistoryStore: SearchHistoryStoreProtocol {
         }
         history = updated
         persist()
-        Logger.search.info("Search history added: query=\(query, privacy: .public), total=\(updated.count)")
+        Logger.search.info("Search history added: query=\(query), total=\(updated.count)")
     }
 
     public func remove(_ query: String) {
         history.removeAll { $0 == query }
         persist()
-        Logger.search.info("Search history removed: query=\(query, privacy: .public)")
+        Logger.search.info("Search history removed: query=\(query)")
     }
 
     public func clear() {

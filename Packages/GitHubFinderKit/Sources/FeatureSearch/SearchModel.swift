@@ -127,7 +127,7 @@ public final class SearchModel {
         allItems = []
         lastSearchedQuery = searchQuery
 
-        Logger.search.info("Search started: query=\(self.searchQuery, privacy: .public), page=1")
+        Logger.search.info("Search started: query=\(self.searchQuery), page=1")
         do {
             let result = try await searchRepository.search(
                 query: searchQuery,
@@ -163,7 +163,7 @@ public final class SearchModel {
         // （同じクエリへ戻したり再入力したり、タブ復帰したときに再検索できるように）
         lastSearchedQuery = nil
         if error is CancellationError || Task.isCancelled {
-            Logger.search.debug("Search cancelled: query=\(self.searchQuery, privacy: .public)")
+            Logger.search.debug("Search cancelled: query=\(self.searchQuery)")
             return
         }
         Logger.search.error("Search failed: \(String(describing: error), privacy: .public)")

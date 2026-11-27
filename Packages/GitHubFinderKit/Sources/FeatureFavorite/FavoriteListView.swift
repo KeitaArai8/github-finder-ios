@@ -354,8 +354,8 @@ private struct FavoriteRow: View {
         .padding(.vertical, Spacing.spacing50)
         .accessibilityElement(children: .combine)
         .accessibilityHint(isEditMode
-            ? Text("ダブルタップで選択/解除", bundle: #bundle)
-            : Text("ダブルタップで GitHub ページを開く", bundle: #bundle)
+            ? Text("選択状態を切り替えます", bundle: #bundle)
+            : Text("GitHub ページを開きます", bundle: #bundle)
         )
     }
 }
